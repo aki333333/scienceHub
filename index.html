@@ -356,7 +356,6 @@ footer{
 </head>
 <body>
 
-<!-- ══════════════ HERO ══════════════ -->
 <section id="hero">
   <canvas id="particles-canvas"></canvas>
 
@@ -393,7 +392,6 @@ footer{
   </div>
 </section>
 
-<!-- ══════════════ QUIZ ══════════════ -->
 <section id="quiz-section">
   <p class="section-label">// מרכז התרגול</p>
 
@@ -437,7 +435,6 @@ footer{
   </div>
 </section>
 
-<!-- ══════════════ FOOTER ══════════════ -->
 <footer>
   <div class="footer-logo">מדע בכיף // SCIENCE HUB</div>
   <div class="footer-divider"></div>
@@ -447,7 +444,6 @@ footer{
   </div>
 </footer>
 
-<!-- ══════════════ PARTICLES ══════════════ -->
 <script>
 (function(){
   const canvas = document.getElementById('particles-canvas');
@@ -490,7 +486,6 @@ footer{
         const dist=Math.sqrt(dx*dx+dy*dy);
         if(dist<CONNECT_DIST){
           const strength=1-dist/CONNECT_DIST;
-          // holographic shimmer – interpolate color
           const t = (Date.now()/3000 + i*0.1) % 1;
           const r = Math.floor(0 + t*123);
           const g = Math.floor(200 + t*55);
@@ -544,7 +539,6 @@ footer{
       p.x+=p.vx; p.y+=p.vy;
       if(p.x<0||p.x>W) p.vx*=-1;
       if(p.y<0||p.y>H) p.vy*=-1;
-      // subtle mouse repel
       const dx=p.x-mouse.x, dy=p.y-mouse.y;
       const dist=Math.sqrt(dx*dx+dy*dy);
       if(dist<80){
@@ -569,7 +563,6 @@ footer{
 })();
 </script>
 
-<!-- ══════════════ QUIZ LOGIC ══════════════ -->
 <script>
 const ALL = [
 {l:1,t:"ביולוגיה",q:"מה הוא ה'תחנת הכוח' של התא?",o:["גרעין","מיטוכונדריה","ריבוזום","ממברנה"],a:1,e:"מיטוכונדריה מייצרת ATP – אנרגיה לתא."},
@@ -649,7 +642,23 @@ const TOPICS = ["הכל","ביולוגיה","כימיה","פיזיקה"];
 const DIFF_LABEL = {1:"קל",2:"בינוני",3:"קשה",4:"מומחה"};
 const DIFF_CLASS = {1:"easy",2:"medium",3:"hard",4:"expert"};
 
-let state = {xp:0,lvl:1,correct:0,wrong:0,streak:0,difficulty:1,topic:"הכל",used:new Set(),answered:false,current:null};
+// --- טעינת נתונים שמורים ---
+let savedXP = parseInt(localStorage.getItem('userXP')) || 0;
+let savedCorrect = parseInt(localStorage.getItem('userCorrect')) || 0;
+let savedWrong = parseInt(localStorage.getItem('userWrong')) || 0;
+
+let state = {
+  xp: savedXP,
+  lvl: 1,
+  correct: savedCorrect,
+  wrong: savedWrong,
+  streak: 0,
+  difficulty: 1,
+  topic: "הכל",
+  used: new Set(),
+  answered: false,
+  current: null
+};
 
 function initTopics(){
   document.getElementById("topicsRow").innerHTML = TOPICS.map(t=>
@@ -690,6 +699,13 @@ function next(){
   document.getElementById("opts").innerHTML=q.o.map((op,i)=>
     `<button class="opt" onclick="answer(${i})">${op}</button>`
   ).join('');
+  
+  // עדכון סטטיסטיקה במסך
+  document.getElementById("correct").textContent=state.correct;
+  document.getElementById("wrong").textContent=state.wrong;
+  document.getElementById("xpNum").textContent=state.xp;
+  updateXPBar();
+
   document.getElementById("prog").textContent=`שאלות שנשאלו: ${state.used.size} | נכון: ${state.correct} | שגוי: ${state.wrong}`;
 }
 
@@ -715,6 +731,12 @@ function answer(i){
     fb.className="feedback wrong show";
     fb.textContent=`✗ שגוי. התשובה הנכונה: ${q.o[q.a]}`;
   }
+  
+  // --- שמירה לדפדפן ---
+  localStorage.setItem('userXP', state.xp);
+  localStorage.setItem('userCorrect', state.correct);
+  localStorage.setItem('userWrong', state.wrong);
+
   document.getElementById("correct").textContent=state.correct;
   document.getElementById("wrong").textContent=state.wrong;
   document.getElementById("xpNum").textContent=state.xp;
