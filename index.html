@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
-<head> <link rel="manifest" href="/manifest.json">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>מדע בכיף – תרגול מקצועות מדעים</title>
+<title>מדע בכיף – תרגול מקצועות</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -11,6 +11,10 @@
   --teal: #00d4aa;
   --blue: #0066ff;
   --purple: #7b2fff;
+  --red: #ff4466;
+  --green: #00ff88;
+  --yellow: #ffcc00;
+  --orange: #ff8800;
   --bg: #020810;
   --surface: rgba(0,245,255,0.04);
   --border: rgba(0,245,255,0.12);
@@ -19,382 +23,171 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{
-  font-family:'Heebo',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  overflow-x:hidden;
-}
+body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
 
 /* ─── HERO ─── */
-#hero{
-  position:relative;
-  width:100%;
-  height:100vh;
-  min-height:600px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-}
+#hero{position:relative;width:100%;height:100vh;min-height:600px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+#particles-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.hero-content{position:relative;z-index:2;text-align:center;padding:2rem}
+.hero-eyebrow{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:6px;color:var(--cyan);text-transform:uppercase;margin-bottom:1.5rem;opacity:0;animation:fadeUp .8s .3s forwards}
+.hero-title{font-family:'Orbitron',monospace;font-size:clamp(2.5rem,8vw,6rem);font-weight:900;line-height:1.05;margin-bottom:1rem;opacity:0;animation:fadeUp .9s .5s forwards}
+.hero-title .line1{display:block;background:linear-gradient(135deg,#fff 0%,var(--cyan) 50%,var(--teal) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-title .line2{display:block;font-size:clamp(1.2rem,3.5vw,2.2rem);font-weight:400;color:var(--muted);-webkit-text-fill-color:var(--muted);margin-top:.5rem;letter-spacing:2px}
+.hero-desc{font-size:clamp(1rem,2vw,1.2rem);color:var(--muted);max-width:600px;margin:0 auto 2.5rem;line-height:1.7;opacity:0;animation:fadeUp .9s .7s forwards}
+.hero-pills{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:2.5rem;opacity:0;animation:fadeUp .9s .85s forwards}
+.pill{padding:6px 16px;border:1px solid var(--border);border-radius:99px;font-size:12px;color:var(--cyan);background:rgba(0,245,255,0.06);letter-spacing:1px}
+.cta-btn{display:inline-flex;align-items:center;gap:10px;padding:14px 36px;background:linear-gradient(135deg,var(--cyan),var(--blue));border:none;border-radius:50px;font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#000;cursor:pointer;text-decoration:none;opacity:0;animation:fadeUp .9s 1s forwards;box-shadow:0 0 40px rgba(0,245,255,0.3);transition:box-shadow .3s,transform .2s}
+.cta-btn:hover{box-shadow:0 0 60px rgba(0,245,255,0.5);transform:translateY(-2px)}
+.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:11px;letter-spacing:2px;opacity:0;animation:fadeIn 1s 1.5s forwards}
+.scroll-arrow{width:1px;height:40px;background:linear-gradient(var(--cyan),transparent);animation:scrollPulse 2s infinite}
 
-#particles-canvas{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  z-index:0;
+/* ─── SUBJECT SELECTOR ─── */
+#subject-section{max-width:1000px;margin:0 auto;padding:4rem 1.5rem 2rem}
+.section-label{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:5px;color:var(--cyan);text-transform:uppercase;margin-bottom:1.5rem;opacity:.7}
+.subjects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:2rem}
+.subj-card{
+  padding:1.4rem 1rem;border:1px solid var(--border);border-radius:18px;
+  background:var(--surface);cursor:pointer;text-align:center;
+  transition:all .25s;backdrop-filter:blur(10px);
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  position:relative;overflow:hidden;
 }
+.subj-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(0,245,255,0.03));opacity:0;transition:opacity .25s}
+.subj-card:hover::before{opacity:1}
+.subj-card:hover{border-color:rgba(0,245,255,0.35);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,245,255,0.1)}
+.subj-card.active{border-color:var(--cyan);background:rgba(0,245,255,0.1)}
+.subj-icon{font-size:2rem}
+.subj-name{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--cyan)}
+.subj-count{font-size:11px;color:var(--muted)}
+/* Subject-specific colors */
+.subj-card[data-subj="ביולוגיה"]:hover,.subj-card[data-subj="ביולוגיה"].active{border-color:#00ff88;box-shadow:0 8px 30px rgba(0,255,136,0.1)}
+.subj-card[data-subj="ביולוגיה"] .subj-name{color:#00ff88}
+.subj-card[data-subj="כימיה"]:hover,.subj-card[data-subj="כימיה"].active{border-color:#ff8800;box-shadow:0 8px 30px rgba(255,136,0,0.1)}
+.subj-card[data-subj="כימיה"] .subj-name{color:#ff8800}
+.subj-card[data-subj="פיזיקה"]:hover,.subj-card[data-subj="פיזיקה"].active{border-color:#7b2fff;box-shadow:0 8px 30px rgba(123,47,255,0.1)}
+.subj-card[data-subj="פיזיקה"] .subj-name{color:#bb88ff}
+.subj-card[data-subj="מתמטיקה"]:hover,.subj-card[data-subj="מתמטיקה"].active{border-color:#ffcc00;box-shadow:0 8px 30px rgba(255,204,0,0.1)}
+.subj-card[data-subj="מתמטיקה"] .subj-name{color:#ffcc00}
+.subj-card[data-subj="מתמטיקה מתקדמת"]:hover,.subj-card[data-subj="מתמטיקה מתקדמת"].active{border-color:#ff4466;box-shadow:0 8px 30px rgba(255,68,102,0.1)}
+.subj-card[data-subj="מתמטיקה מתקדמת"] .subj-name{color:#ff8899}
+.subj-card[data-subj="אנגלית"]:hover,.subj-card[data-subj="אנגלית"].active{border-color:#00d4aa;box-shadow:0 8px 30px rgba(0,212,170,0.1)}
+.subj-card[data-subj="אנגלית"] .subj-name{color:#00d4aa}
+.subj-card[data-subj="רפואה"]:hover,.subj-card[data-subj="רפואה"].active{border-color:#ff4466;box-shadow:0 8px 30px rgba(255,68,102,0.15)}
+.subj-card[data-subj="רפואה"] .subj-name{color:#ff6680}
+.subj-card[data-subj="הכל"]:hover,.subj-card[data-subj="הכל"].active{border-color:var(--cyan);box-shadow:0 8px 30px rgba(0,245,255,0.1)}
 
-.hero-content{
-  position:relative;
-  z-index:2;
-  text-align:center;
-  padding:2rem;
-}
-
-.hero-eyebrow{
-  font-family:'Orbitron',monospace;
-  font-size:11px;
-  letter-spacing:6px;
-  color:var(--cyan);
-  text-transform:uppercase;
-  margin-bottom:1.5rem;
-  opacity:0;
-  animation:fadeUp .8s .3s forwards;
-}
-
-.hero-title{
-  font-family:'Orbitron',monospace;
-  font-size:clamp(2.5rem,8vw,6rem);
-  font-weight:900;
-  line-height:1.05;
-  margin-bottom:1rem;
-  opacity:0;
-  animation:fadeUp .9s .5s forwards;
-}
-
-.hero-title .line1{
-  display:block;
-  background:linear-gradient(135deg,#fff 0%,var(--cyan) 50%,var(--teal) 100%);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  background-clip:text;
-}
-
-.hero-title .line2{
-  display:block;
-  font-size:clamp(1.2rem,3.5vw,2.2rem);
-  font-weight:400;
-  color:var(--muted);
-  -webkit-text-fill-color:var(--muted);
-  margin-top:.5rem;
-  letter-spacing:2px;
-}
-
-.hero-desc{
-  font-size:clamp(1rem,2vw,1.2rem);
-  color:var(--muted);
-  max-width:560px;
-  margin:0 auto 2.5rem;
-  line-height:1.7;
-  opacity:0;
-  animation:fadeUp .9s .7s forwards;
-}
-
-.hero-pills{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  flex-wrap:wrap;
-  margin-bottom:2.5rem;
-  opacity:0;
-  animation:fadeUp .9s .85s forwards;
-}
-
-.pill{
-  padding:6px 16px;
-  border:1px solid var(--border);
-  border-radius:99px;
-  font-size:12px;
-  color:var(--cyan);
-  background:rgba(0,245,255,0.06);
-  letter-spacing:1px;
-}
-
-.cta-btn{
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
-  padding:14px 36px;
-  background:linear-gradient(135deg,var(--cyan),var(--blue));
-  border:none;
-  border-radius:50px;
-  font-family:'Orbitron',monospace;
-  font-size:14px;
-  font-weight:700;
-  color:#000;
-  cursor:pointer;
-  text-decoration:none;
-  opacity:0;
-  animation:fadeUp .9s 1s forwards;
-  box-shadow:0 0 40px rgba(0,245,255,0.3);
-  transition:box-shadow .3s,transform .2s;
-}
-.cta-btn:hover{
-  box-shadow:0 0 60px rgba(0,245,255,0.5);
-  transform:translateY(-2px);
-}
-
-.scroll-hint{
-  position:absolute;
-  bottom:2rem;
-  left:50%;
-  transform:translateX(-50%);
-  z-index:2;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:6px;
-  color:var(--muted);
-  font-size:11px;
-  letter-spacing:2px;
-  opacity:0;
-  animation:fadeIn 1s 1.5s forwards;
-}
-.scroll-arrow{
-  width:1px;
-  height:40px;
-  background:linear-gradient(var(--cyan),transparent);
-  animation:scrollPulse 2s infinite;
-}
+/* ─── MODAL ─── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(8px)}
+.modal-box{background:#060f1a;border:1px solid rgba(255,68,102,0.4);border-radius:24px;padding:2.5rem;max-width:480px;width:100%;text-align:center;box-shadow:0 0 60px rgba(255,68,102,0.2);animation:fadeUp .4s forwards}
+.modal-icon{font-size:3rem;margin-bottom:1rem}
+.modal-title{font-family:'Orbitron',monospace;font-size:1.1rem;color:#ff6680;margin-bottom:1rem;letter-spacing:2px}
+.modal-body{font-size:14px;line-height:1.8;color:var(--muted);margin-bottom:1.5rem}
+.modal-body strong{color:var(--text)}
+.modal-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.modal-confirm{padding:12px 30px;background:linear-gradient(135deg,rgba(255,68,102,0.2),rgba(255,68,102,0.1));border:1px solid rgba(255,68,102,0.5);border-radius:12px;color:#ff6680;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:1px}
+.modal-confirm:hover{background:rgba(255,68,102,0.25);box-shadow:0 0 20px rgba(255,68,102,0.2)}
+.modal-cancel{padding:12px 24px;background:transparent;border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:13px;cursor:pointer;transition:all .2s;font-family:'Heebo',sans-serif}
+.modal-cancel:hover{border-color:rgba(0,245,255,0.3);color:var(--text)}
 
 /* ─── QUIZ SECTION ─── */
-#quiz-section{
-  max-width:820px;
-  margin:0 auto;
-  padding:4rem 1.5rem 2rem;
-}
-
-.section-label{
-  font-family:'Orbitron',monospace;
-  font-size:10px;
-  letter-spacing:5px;
-  color:var(--cyan);
-  text-transform:uppercase;
-  margin-bottom:1.5rem;
-  opacity:.7;
-}
-
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:.75rem 1.2rem;
-  background:var(--surface);
-  border-radius:14px;
-  border:1px solid var(--border);
-  margin-bottom:1rem;
-  flex-wrap:wrap;
-  gap:.5rem;
-  backdrop-filter:blur(10px);
-}
+#quiz-section{max-width:820px;margin:0 auto;padding:2rem 1.5rem 2rem;display:none}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1.2rem;background:var(--surface);border-radius:14px;border:1px solid var(--border);margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;backdrop-filter:blur(10px)}
 .topbar-left{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
 .stat{font-size:13px;color:var(--muted)}
 .stat span{font-weight:700;color:var(--cyan);font-size:14px}
-select{
-  font-size:13px;padding:5px 10px;
-  border-radius:8px;border:1px solid var(--border);
-  background:rgba(0,245,255,0.06);color:var(--cyan);
-  cursor:pointer;
-}
-
+select{font-size:13px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:rgba(0,245,255,0.06);color:var(--cyan);cursor:pointer}
 .xp-bar-wrap{margin-bottom:1rem}
 .xp-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px}
 .xp-track{height:5px;background:rgba(255,255,255,0.05);border-radius:99px}
 .xp-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--teal),var(--cyan));transition:width .5s ease;box-shadow:0 0 8px var(--cyan)}
-
-.topics{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
-.topic-btn{
-  font-size:12px;padding:5px 14px;border-radius:99px;
-  border:1px solid var(--border);background:transparent;
-  color:var(--muted);cursor:pointer;transition:all .2s;
-  font-family:'Heebo',sans-serif;
-}
-.topic-btn.active{background:rgba(0,245,255,0.12);color:var(--cyan);border-color:var(--cyan)}
-.topic-btn:hover:not(.active){border-color:rgba(0,245,255,0.3);color:var(--text)}
-
-.card{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:20px;
-  padding:2rem;
-  backdrop-filter:blur(12px);
-  position:relative;
-  overflow:hidden;
-}
-.card::before{
-  content:'';
-  position:absolute;
-  top:-1px;left:30%;right:30%;
-  height:1px;
-  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
-}
-
-.badge{
-  display:inline-block;font-size:10px;padding:3px 12px;
-  border-radius:99px;margin-bottom:1rem;font-weight:700;
-  letter-spacing:2px;text-transform:uppercase;font-family:'Orbitron',monospace;
-}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;backdrop-filter:blur(12px);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:-1px;left:30%;right:30%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent)}
+.badge{display:inline-block;font-size:10px;padding:3px 12px;border-radius:99px;margin-bottom:1rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-family:'Orbitron',monospace}
 .badge.easy{background:rgba(0,255,100,0.08);color:#00ff88;border:1px solid rgba(0,255,100,0.2)}
 .badge.medium{background:rgba(255,200,0,0.08);color:#ffcc00;border:1px solid rgba(255,200,0,0.2)}
 .badge.hard{background:rgba(255,80,80,0.08);color:#ff6666;border:1px solid rgba(255,80,80,0.2)}
 .badge.expert{background:rgba(150,80,255,0.1);color:#bb88ff;border:1px solid rgba(150,80,255,0.2)}
-
-.question{
-  font-size:18px;font-weight:500;line-height:1.6;
-  color:var(--text);margin-bottom:1.5rem;
-}
-
+.current-subject-label{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);margin-bottom:.5rem;text-transform:uppercase}
+.question{font-size:18px;font-weight:500;line-height:1.6;color:var(--text);margin-bottom:1.5rem}
 .options{display:grid;gap:10px}
-.opt{
-  width:100%;padding:.85rem 1.2rem;text-align:right;
-  font-size:14px;border:1px solid var(--border);border-radius:12px;
-  background:rgba(255,255,255,0.02);color:var(--text);
-  cursor:pointer;transition:all .2s;line-height:1.4;
-  font-family:'Heebo',sans-serif;
-  position:relative;overflow:hidden;
-}
-.opt::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,transparent,rgba(0,245,255,0.04));
-  opacity:0;transition:opacity .2s;
-}
+.opt{width:100%;padding:.85rem 1.2rem;text-align:right;font-size:14px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.02);color:var(--text);cursor:pointer;transition:all .2s;line-height:1.4;font-family:'Heebo',sans-serif;position:relative;overflow:hidden}
+.opt::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(0,245,255,0.04));opacity:0;transition:opacity .2s}
 .opt:hover:not(:disabled)::before{opacity:1}
 .opt:hover:not(:disabled){border-color:rgba(0,245,255,0.3);transform:translateX(-3px)}
 .opt.correct{background:rgba(0,255,100,0.06);border-color:#00ff88;color:#00ff88}
 .opt.wrong{background:rgba(255,80,80,0.06);border-color:#ff6666;color:#ff6666}
 .opt.reveal{background:rgba(0,200,255,0.06);border-color:var(--cyan);color:var(--cyan)}
 .opt:disabled{cursor:default;transform:none}
-
-.feedback{
-  margin-top:1rem;padding:.85rem 1.2rem;
-  border-radius:12px;font-size:14px;line-height:1.5;display:none;
-}
+.feedback{margin-top:1rem;padding:.85rem 1.2rem;border-radius:12px;font-size:14px;line-height:1.5;display:none}
 .feedback.show{display:block}
 .feedback.correct{background:rgba(0,255,100,0.06);color:#00ff88;border:1px solid rgba(0,255,100,0.2)}
 .feedback.wrong{background:rgba(255,80,80,0.06);color:#ff6666;border:1px solid rgba(255,80,80,0.2)}
 .feedback.explain{background:rgba(0,200,255,0.06);color:var(--cyan);border:1px solid rgba(0,200,255,0.2)}
-
-.level-up{
-  display:none;padding:1rem;text-align:center;
-  background:rgba(123,47,255,0.1);border:1px solid rgba(123,47,255,0.3);
-  border-radius:12px;margin-top:1rem;color:#bb88ff;font-weight:700;
-  font-family:'Orbitron',monospace;font-size:13px;letter-spacing:1px;
-}
+.level-up{display:none;padding:1rem;text-align:center;background:rgba(123,47,255,0.1);border:1px solid rgba(123,47,255,0.3);border-radius:12px;margin-top:1rem;color:#bb88ff;font-weight:700;font-family:'Orbitron',monospace;font-size:13px;letter-spacing:1px}
 .level-up.show{display:block}
-
 .actions{display:flex;gap:10px;margin-top:1.2rem;flex-wrap:wrap}
-.btn{
-  padding:10px 22px;font-size:13px;font-weight:700;
-  border:1px solid var(--border);border-radius:10px;
-  background:transparent;color:var(--text);
-  cursor:pointer;transition:all .2s;font-family:'Heebo',sans-serif;
-}
+.btn{padding:10px 22px;font-size:13px;font-weight:700;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text);cursor:pointer;transition:all .2s;font-family:'Heebo',sans-serif}
 .btn:hover{background:rgba(255,255,255,0.05);border-color:rgba(0,245,255,0.3)}
-.btn.primary{
-  background:linear-gradient(135deg,rgba(0,245,255,0.15),rgba(0,102,255,0.15));
-  color:var(--cyan);border-color:rgba(0,245,255,0.4);
-}
+.btn.primary{background:linear-gradient(135deg,rgba(0,245,255,0.15),rgba(0,102,255,0.15));color:var(--cyan);border-color:rgba(0,245,255,0.4)}
 .btn.primary:hover{box-shadow:0 0 20px rgba(0,245,255,0.15)}
 .btn.primary:disabled{opacity:.3;cursor:default;box-shadow:none}
-
-.streak{
-  font-size:12px;padding:4px 12px;border-radius:99px;
-  background:rgba(255,200,0,0.08);color:#ffcc00;
-  border:1px solid rgba(255,200,0,0.2);
-}
+.btn.back-btn{background:rgba(255,255,255,0.03);color:var(--muted)}
+.streak{font-size:12px;padding:4px 12px;border-radius:99px;background:rgba(255,200,0,0.08);color:#ffcc00;border:1px solid rgba(255,200,0,0.2)}
 .progress{font-size:12px;color:var(--muted);margin-top:.85rem}
 
-/* ─── FOOTER ─── */
-footer{
-  border-top:1px solid var(--border);
-  margin-top:6rem;
-  padding:3rem 1.5rem;
-  text-align:center;
-}
-.footer-logo{
-  font-family:'Orbitron',monospace;
-  font-size:16px;font-weight:700;
-  background:linear-gradient(135deg,var(--cyan),var(--teal));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
-  margin-bottom:1rem;
-}
-.footer-copy{
-  font-size:13px;color:var(--muted);line-height:2;
-}
-.footer-copy strong{color:var(--cyan);font-weight:500}
-.footer-divider{
-  width:60px;height:1px;
-  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
-  margin:1.2rem auto;
-}
+/* medical warning badge */
+.medical-banner{display:flex;align-items:center;gap:8px;padding:.6rem 1rem;background:rgba(255,68,102,0.06);border:1px solid rgba(255,68,102,0.2);border-radius:10px;margin-bottom:1rem;font-size:12px;color:#ff8899}
 
-/* ─── ANIMATIONS ─── */
-@keyframes fadeUp{
-  from{opacity:0;transform:translateY(24px)}
-  to{opacity:1;transform:translateY(0)}
-}
+/* ─── FOOTER ─── */
+footer{border-top:1px solid var(--border);margin-top:6rem;padding:3rem 1.5rem;text-align:center}
+.footer-logo{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;background:linear-gradient(135deg,var(--cyan),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem}
+.footer-copy{font-size:13px;color:var(--muted);line-height:2}
+.footer-copy strong{color:var(--cyan);font-weight:500}
+.footer-divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);margin:1.2rem auto}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes scrollPulse{
-  0%,100%{opacity:.2;transform:scaleY(.8)}
-  50%{opacity:1;transform:scaleY(1)}
-}
+@keyframes scrollPulse{0%,100%{opacity:.2;transform:scaleY(.8)}50%{opacity:1;transform:scaleY(1)}}
 </style>
 </head>
 <body>
 
 <section id="hero">
   <canvas id="particles-canvas"></canvas>
-
   <div class="hero-content">
-    <p class="hero-eyebrow">SCIENCE LEARNING PLATFORM</p>
-
+    <p class="hero-eyebrow">SCIENCE & KNOWLEDGE LEARNING PLATFORM</p>
     <h1 class="hero-title">
       <span class="line1">מדע בכיף</span>
-      <span class="line2">תרגול מקצועות מדעים</span>
+      <span class="line2">תרגול מקצועות לימוד</span>
     </h1>
-
-    <p class="hero-desc">
-      פיזיקה, כימיה וביולוגיה – מרמת מתחיל עד מומחה.<br>
-      שאלות אמיתיות, מערכת XP, ותרגול חכם שמתקדם איתך.
-    </p>
-
+    <p class="hero-desc">פיזיקה, כימיה, ביולוגיה, מתמטיקה, אנגלית ורפואה – מרמת מתחיל עד מומחה. שאלות אמיתיות, מערכת XP, ותרגול חכם שמתקדם איתך.</p>
     <div class="hero-pills">
       <span class="pill">ביולוגיה</span>
       <span class="pill">כימיה</span>
       <span class="pill">פיזיקה</span>
+      <span class="pill">מתמטיקה</span>
+      <span class="pill">אנגלית</span>
+      <span class="pill">רפואה</span>
       <span class="pill">4 רמות קושי</span>
-      <span class="pill">מעל 60 שאלות</span>
+      <span class="pill">מאות שאלות</span>
     </div>
-
-    <a href="#quiz-section" class="cta-btn">
+    <a href="#subject-section" class="cta-btn">
       התחל לתרגל
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
     </a>
   </div>
-
-  <div class="scroll-hint">
-    <span>גלול למטה</span>
-    <div class="scroll-arrow"></div>
-  </div>
+  <div class="scroll-hint"><span>גלול למטה</span><div class="scroll-arrow"></div></div>
 </section>
 
+<!-- SUBJECT SELECTOR -->
+<section id="subject-section">
+  <p class="section-label">// בחר מקצוע</p>
+  <div class="subjects-grid" id="subjectsGrid"></div>
+</section>
+
+<!-- QUIZ SECTION -->
 <section id="quiz-section">
   <p class="section-label">// מרכז התרגול</p>
-
   <div class="topbar">
     <div class="topbar-left">
       <div class="stat">רמה:
@@ -413,15 +206,13 @@ footer{
       <div class="stat">XP: <span id="xpNum">0</span></div>
     </div>
   </div>
-
   <div class="xp-bar-wrap">
     <div class="xp-label"><span id="lvlLabel">רמה 1</span><span id="xpNext">0 / 100 XP</span></div>
     <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
   </div>
-
-  <div class="topics" id="topicsRow"></div>
-
+  <div id="medicalBanner" class="medical-banner" style="display:none">⚕️ מצב לימוד רפואי – כל המידע הוא למטרות לימודיות בלבד</div>
   <div class="card">
+    <div class="current-subject-label" id="currentSubjectLabel"></div>
     <div class="badge" id="badgeDiff">קל</div>
     <div class="question" id="qText"></div>
     <div class="options" id="opts"></div>
@@ -430,13 +221,33 @@ footer{
     <div class="actions">
       <button class="btn primary" id="nextBtn" onclick="next()" disabled>הבא ←</button>
       <button class="btn" onclick="explainQ()">💡 הסבר</button>
+      <button class="btn back-btn" onclick="goBack()">← חזור למקצועות</button>
     </div>
     <div class="progress" id="prog"></div>
   </div>
 </section>
 
+<!-- MEDICAL WARNING MODAL -->
+<div class="modal-overlay" id="medModal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-icon">⚕️</div>
+    <div class="modal-title">// אזהרה רפואית</div>
+    <div class="modal-body">
+      <strong>לפני שתתחיל/י, יש לאשר:</strong><br><br>
+      כל מה שנלמד כאן הוא <strong>למטרות לימודיות בלבד</strong>.<br>
+      אין להשתמש במידע זה במצבי אמת ללא הכשרה מתאימה.<br><br>
+      במצב חירום רפואי – פנה/י לשירותי חירום (101 / 100) בלבד.<br><br>
+      <strong>השאלות מבוססות על פרוטוקולי מד"א ועקרונות עזרה ראשונה.</strong>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-confirm" onclick="confirmMedical()">✓ אני מאשר/ת ומבין/ה</button>
+      <button class="modal-cancel" onclick="cancelMedical()">ביטול</button>
+    </div>
+  </div>
+</div>
+
 <footer>
-  <div class="footer-logo">מדע בכיף // SCIENCE HUB</div>
+  <div class="footer-logo">מדע בכיף // KNOWLEDGE HUB</div>
   <div class="footer-divider"></div>
   <div class="footer-copy">
     <strong>© כל הזכויות שמורות למאור אביטבול</strong><br>
@@ -445,147 +256,138 @@ footer{
 </footer>
 
 <script>
+// ─── PARTICLES ───
 (function(){
-  const canvas = document.getElementById('particles-canvas');
-  const ctx = canvas.getContext('2d');
-  let W, H, particles, mouse = {x:-9999,y:-9999};
-
-  const COLORS = ['#00f5ff','#00d4aa','#0099ff','#7b2fff','#ffffff'];
-  const N = 90, CONNECT_DIST = 140, MOUSE_DIST = 100;
-
-  function resize(){
-    W = canvas.width = canvas.offsetWidth;
-    H = canvas.height = canvas.offsetHeight;
-  }
-
+  const canvas=document.getElementById('particles-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H,particles,mouse={x:-9999,y:-9999};
+  const COLORS=['#00f5ff','#00d4aa','#0099ff','#7b2fff','#ffffff'];
+  const N=90,CONNECT_DIST=140,MOUSE_DIST=100;
+  function resize(){W=canvas.width=canvas.offsetWidth;H=canvas.height=canvas.offsetHeight}
   function rand(a,b){return Math.random()*(b-a)+a}
-
-  function makeParticle(){
-    return {
-      x: rand(0,W), y: rand(0,H),
-      vx: rand(-.35,.35), vy: rand(-.35,.35),
-      r: rand(1.5,3.5),
-      color: COLORS[Math.floor(Math.random()*COLORS.length)],
-      alpha: rand(.4,.9)
-    }
-  }
-
-  function init(){
-    resize();
-    particles = Array.from({length:N},makeParticle);
-  }
-
+  function makeP(){return{x:rand(0,W),y:rand(0,H),vx:rand(-.35,.35),vy:rand(-.35,.35),r:rand(1.5,3.5),color:COLORS[Math.floor(Math.random()*COLORS.length)],alpha:rand(.4,.9)}}
+  function init(){resize();particles=Array.from({length:N},makeP)}
   function draw(){
     ctx.clearRect(0,0,W,H);
-
-    // draw connections
     for(let i=0;i<particles.length;i++){
       for(let j=i+1;j<particles.length;j++){
-        const a=particles[i], b=particles[j];
-        const dx=a.x-b.x, dy=a.y-b.y;
-        const dist=Math.sqrt(dx*dx+dy*dy);
-        if(dist<CONNECT_DIST){
-          const strength=1-dist/CONNECT_DIST;
-          const t = (Date.now()/3000 + i*0.1) % 1;
-          const r = Math.floor(0 + t*123);
-          const g = Math.floor(200 + t*55);
-          const bl = Math.floor(200 + t*55);
-          ctx.beginPath();
-          ctx.strokeStyle=`rgba(${r},${g},${bl},${strength*0.55})`;
-          ctx.lineWidth=strength*1.2;
-          ctx.moveTo(a.x,a.y);
-          ctx.lineTo(b.x,b.y);
-          ctx.stroke();
-        }
+        const a=particles[i],b=particles[j];
+        const dx=a.x-b.x,dy=a.y-b.y,dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<CONNECT_DIST){const s=1-dist/CONNECT_DIST;ctx.beginPath();ctx.strokeStyle=`rgba(0,200,220,${s*0.45})`;ctx.lineWidth=s*1.2;ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}
       }
     }
-
-    // mouse glow connections
     for(let p of particles){
-      const dx=p.x-mouse.x, dy=p.y-mouse.y;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<MOUSE_DIST){
-        const s=1-dist/MOUSE_DIST;
-        ctx.beginPath();
-        ctx.strokeStyle=`rgba(0,245,255,${s*0.8})`;
-        ctx.lineWidth=s*1.5;
-        ctx.moveTo(p.x,p.y);
-        ctx.lineTo(mouse.x,mouse.y);
-        ctx.stroke();
-      }
+      const dx=p.x-mouse.x,dy=p.y-mouse.y,dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<MOUSE_DIST){const s=1-dist/MOUSE_DIST;ctx.beginPath();ctx.strokeStyle=`rgba(0,245,255,${s*0.8})`;ctx.lineWidth=s*1.5;ctx.moveTo(p.x,p.y);ctx.lineTo(mouse.x,mouse.y);ctx.stroke()}
     }
-
-    // draw particles
     for(let p of particles){
-      const glow = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*3);
-      glow.addColorStop(0,p.color+'cc');
-      glow.addColorStop(1,'transparent');
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.r*3,0,Math.PI*2);
-      ctx.fillStyle=glow;
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle=p.color;
-      ctx.globalAlpha=p.alpha;
-      ctx.fill();
-      ctx.globalAlpha=1;
+      const glow=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*3);
+      glow.addColorStop(0,p.color+'cc');glow.addColorStop(1,'transparent');
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r*3,0,Math.PI*2);ctx.fillStyle=glow;ctx.fill();
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.color;ctx.globalAlpha=p.alpha;ctx.fill();ctx.globalAlpha=1;
     }
   }
-
   function update(){
     for(let p of particles){
-      p.x+=p.vx; p.y+=p.vy;
-      if(p.x<0||p.x>W) p.vx*=-1;
-      if(p.y<0||p.y>H) p.vy*=-1;
-      const dx=p.x-mouse.x, dy=p.y-mouse.y;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<80){
-        const f=(80-dist)/80*0.3;
-        p.vx+=dx/dist*f; p.vy+=dy/dist*f;
-        const spd=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
-        if(spd>1.2){p.vx*=1.2/spd;p.vy*=1.2/spd;}
-      }
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
+      const dx=p.x-mouse.x,dy=p.y-mouse.y,dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<80){const f=(80-dist)/80*0.3;p.vx+=dx/dist*f;p.vy+=dy/dist*f;const spd=Math.sqrt(p.vx*p.vx+p.vy*p.vy);if(spd>1.2){p.vx*=1.2/spd;p.vy*=1.2/spd}}
     }
   }
-
   function loop(){draw();update();requestAnimationFrame(loop)}
-
-  canvas.addEventListener('mousemove',e=>{
-    const r=canvas.getBoundingClientRect();
-    mouse.x=e.clientX-r.left; mouse.y=e.clientY-r.top;
-  });
+  canvas.addEventListener('mousemove',e=>{const r=canvas.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top});
   canvas.addEventListener('mouseleave',()=>{mouse.x=-9999;mouse.y=-9999});
-
-  window.addEventListener('resize',()=>{resize();});
-  init(); loop();
+  window.addEventListener('resize',resize);
+  init();loop();
 })();
 </script>
 
 <script>
+// ─── QUESTION BANK ───
 const ALL = [
+// ══════════════════════════════════════════════════════════
+// BIOLOGY – LEVEL 1
+// ══════════════════════════════════════════════════════════
 {l:1,t:"ביולוגיה",q:"מה הוא ה'תחנת הכוח' של התא?",o:["גרעין","מיטוכונדריה","ריבוזום","ממברנה"],a:1,e:"מיטוכונדריה מייצרת ATP – אנרגיה לתא."},
-{l:1,t:"ביולוגיה",q:"איזה גז אנו נושמים?",o:["CO₂","חנקן","חמצן","הליום"],a:2,e:"חמצן נדרש לנשימה תאית."},
+{l:1,t:"ביולוגיה",q:"איזה גז אנו נושמים פנימה?",o:["CO₂","חנקן","חמצן","הליום"],a:2,e:"חמצן נדרש לנשימה תאית."},
 {l:1,t:"ביולוגיה",q:"מה תפקיד הגרעין בתא?",o:["ייצור אנרגיה","בקרת התא","עיכול מזון","תנועה"],a:1,e:"הגרעין מכיל DNA ושולט בפעולות התא."},
 {l:1,t:"ביולוגיה",q:"כמה לבבות יש לאדם?",o:["שניים","אחד","שלושה","ארבעה"],a:1,e:"ללב אדם יש 4 חדרים אך זהו לב אחד."},
 {l:1,t:"ביולוגיה",q:"מה תפקיד הריאות?",o:["עיכול","שינה","חילופי גזים","ייצור דם"],a:2,e:"הריאות קולטות חמצן ומפרישות CO₂."},
 {l:1,t:"ביולוגיה",q:"מה צמחים עושים באור שמש?",o:["נשימה","פוטוסינתזה","שינה","הפרשה"],a:1,e:"פוטוסינתזה: CO₂ + מים + אור → גלוקוז + O₂."},
 {l:1,t:"ביולוגיה",q:"כמה כרומוזומים יש לאדם?",o:["23","44","46","48"],a:2,e:"לאדם 46 כרומוזומים (23 זוגות)."},
-{l:1,t:"ביולוגיה",q:"איזה איבר מסנן את הדם?",o:["לב","ריאות","כליות","כבד"],a:2,e:"הכליות מסננות פסולת מהדם ומייצרות שתן."},
-{l:1,t:"ביולוגיה",q:"מה הוא הנוזל האדום בגוף?",o:["לימפה","מים","דם","מרה"],a:2,e:"דם מכיל תאי דם אדומים, לבנים, וטסיות."},
+{l:1,t:"ביולוגיה",q:"איזה איבר מסנן את הדם?",o:["לב","ריאות","כליות","כבד"],a:2,e:"הכליות מסננות פסולת מהדם."},
+{l:1,t:"ביולוגיה",q:"מה מייצרים ריבוזומים?",o:["DNA","חלבונים","שומנים","פחמימות"],a:1,e:"ריבוזומים הם המפעלים לייצור חלבון בתא."},
 {l:1,t:"ביולוגיה",q:"מה הם יונקים?",o:["מטילים ביצים","בעלי חום גוף קבוע","חיים במים בלבד","ללא שלד"],a:1,e:"יונקים הם בעלי חיים חמים-דמיים שמיניקים."},
+{l:1,t:"ביולוגיה",q:"מה הוא פלסמה?",o:["גז","חלק נוזלי של הדם","עצמות","תא עצב"],a:1,e:"פלסמה היא החלק הנוזלי של הדם – כ-55% מנפחו."},
+{l:1,t:"ביולוגיה",q:"מה פונקציית תאי הדם הלבנים?",o:["נשיאת חמצן","הגנה מפני חיידקים","קרישת דם","ייצור ATP"],a:1,e:"תאי דם לבנים (לויקוציטים) הם חיילי מערכת החיסון."},
+{l:1,t:"ביולוגיה",q:"כמה שלבים יש למיטוזה?",o:["2","3","4","5"],a:2,e:"4 שלבים: פרופאזה, מטאפאזה, אנאפאזה, טלופאזה."},
+{l:1,t:"ביולוגיה",q:"מה הוא אורגניזם?",o:["כוכב","יצור חי","סוג עצם","גז"],a:1,e:"אורגניזם = כל יצור חי – חיידק, צמח או בעל חיים."},
+{l:1,t:"ביולוגיה",q:"מה מכיל הכלורופלסט?",o:["DNA בלבד","כלורופיל המבצע פוטוסינתזה","ATP בלבד","ריבוזומים"],a:1,e:"כלורופלסט מכיל כלורופיל הקולט אור לביצוע פוטוסינתזה."},
+{l:1,t:"ביולוגיה",q:"מה הוא אפידרמיס?",o:["שכבת עצמות","שכבת עור חיצונית","רקמת שריר","אבר פנימי"],a:1,e:"אפידרמיס היא השכבה החיצונית של העור."},
+// BIOLOGY – LEVEL 2
+{l:2,t:"ביולוגיה",q:"מה הוא DNA?",o:["חלבון","חומצת גרעין נושאת מידע גנטי","שומן","פחמימה"],a:1,e:"DNA נושא את המידע הגנטי בצורת רצף בסיסים."},
+{l:2,t:"ביולוגיה",q:"מה הוא אוסמוזה?",o:["העברת חום","תנועת מים דרך ממברנה חדירה למחצה","חלוקת תא","ייצור אנרגיה"],a:1,e:"מים עוברים מריכוז נמוך לגבוה של חומר מומס."},
+{l:2,t:"ביולוגיה",q:"מה הוא אנזים?",o:["פחמימה","שומן","קטליזטור ביולוגי","ויטמין"],a:2,e:"אנזים מאיץ תגובות כימיות ללא שהוא משתנה עצמו."},
+{l:2,t:"ביולוגיה",q:"מה הוא מיטוזה?",o:["מוות תאי","חלוקה מינית","חלוקה המייצרת 2 תאים זהים","ייצור חלבון"],a:2,e:"במיטוזה תא אם מתחלק לשני תאי בת עם DNA זהה."},
+{l:2,t:"ביולוגיה",q:"מה הוא RNA שליח (mRNA)?",o:["תבנית DNA","מולקולה המעבירה מידע מה-DNA לריבוזום","אנזים","ממברנה"],a:1,e:"mRNA מעתיק את המידע מה-DNA ומוביל אותו לריבוזומים."},
+{l:2,t:"ביולוגיה",q:"מה הוא ה-ATP?",o:["חלבון","שומן","מולקולת האנרגיה של התא","ויטמין"],a:2,e:"ATP (אדנוזין טריפוספט) הוא 'מטבע האנרגיה' התאי."},
+{l:2,t:"ביולוגיה",q:"מה ההבדל בין תאים פרוקריוטיים לאיקריוטיים?",o:["גודל בלבד","לפרוקריוטים אין גרעין ממברנטי","אוקריוטים חסרי DNA","פרוקריוטים רב-תאיים"],a:1,e:"חיידקים פרוקריוטיים – ללא גרעין ממברנטי."},
+{l:2,t:"ביולוגיה",q:"מה הוא מיאוזה?",o:["חלוקה ל-2 תאים זהים","חלוקה ל-4 תאים עם מחצית כרומוזומים","מוות תאי","שכפול DNA"],a:1,e:"מיאוזה מייצרת 4 תאי מין (גמטות) עם n כרומוזומים."},
+{l:2,t:"ביולוגיה",q:"מה תפקיד הכבד?",o:["נשימה","ייצור הורמונים בלבד","סינון דם, ייצור מרה, מטבוליזם","קרישת דם בלבד"],a:2,e:"הכבד מבצע מאות פונקציות: מטבוליזם, סינון, ייצור מרה ועוד."},
+{l:2,t:"ביולוגיה",q:"מה הוא ממברנת התא?",o:["קיר קשיח","שכבת פוספוליפידים דו-שכבתית","רשת חלבונים","מאגר אנרגיה"],a:1,e:"הממברנה בנויה משכבת פוספוליפידים דו-שכבתית עם חלבוני ממברנה."},
+// BIOLOGY – LEVEL 3
+{l:3,t:"ביולוגיה",q:"מה הוא אפיגנטיקה?",o:["מוטציות DNA","שינויים בביטוי גנטי ללא שינוי DNA","חלוקת תאים","תורת האבולוציה"],a:1,e:"אפיגנטיקה: מיתילציה של DNA והיסטונים משנה ביטוי גנים."},
+{l:3,t:"ביולוגיה",q:"מה הוא פוטנציאל הפעולה?",o:["כיווץ שריר","הפולס החשמלי בנוירון","סינתזת חלבון","חלוקת תא"],a:1,e:"דה-פולריזציה ורה-פולריזציה של ממברנת נוירון מאפשרות העברת אותות."},
+{l:3,t:"ביולוגיה",q:"מה הם אנטיגנים?",o:["נוגדנים","מולקולות שמפעילות תגובה חיסונית","אנזימים","הורמונים"],a:1,e:"אנטיגן: מולקולה זרה שהמערכת החיסונית מזהה ותוקפת."},
+{l:3,t:"ביולוגיה",q:"מה הוא מחזור קרבס?",o:["מחזור חנקן","מחזור קרבון","סדרת תגובות במיטוכונדריה המייצרות ATP","סינתזת DNA"],a:2,e:"מחזור קרבס (TCA) מייצר NADH, FADH₂ ו-GTP."},
+{l:3,t:"ביולוגיה",q:"מה הם טלומרים?",o:["גנים מרכזיים","קצות הכרומוזומים","ריבוזומים","DNA מעגלי"],a:1,e:"טלומרים: רצפי DNA חוזרים בקצות הכרומוזומים."},
+{l:3,t:"ביולוגיה",q:"מה הוא ה-CRISPR-Cas9?",o:["סוג וירוס","שיטת עריכת גנום","חלבון מבני","מעכב מטבולי"],a:1,e:"CRISPR-Cas9 מאפשר עריכה מדויקת של DNA בעזרת RNA מנחה."},
+{l:3,t:"ביולוגיה",q:"מה הוא אפופטוזיס?",o:["חלוקת תאים","מוות תאי מתוכנן","מוטציה","זיהום"],a:1,e:"אפופטוזיס: מוות תאי מבוקר ומתוכנן – חיוני למניעת סרטן."},
+{l:3,t:"ביולוגיה",q:"מה הוא האנזים הליקאז?",o:["חותך DNA","פותח את מסלול הכפיל של DNA","מקשר חלבונים","מאיץ ATP"],a:1,e:"הליקאז מפריד את שתי שרשראות ה-DNA לפני שכפול."},
+// BIOLOGY – LEVEL 4
+{l:4,t:"ביולוגיה",q:"מה הוא signal transduction pathway של MAPK?",o:["העברת גן","סדרת זרחון חלבוני מ-Ras לאקטיבציה של ERK","מחזור ATP","טרנסקריפציה"],a:1,e:"MAPK/ERK: Ras→Raf→MEK→ERK. פועל בתגובה לגורמי גדילה."},
+{l:4,t:"ביולוגיה",q:"מה הוא synthetic lethality בסרטן?",o:["תרופה הורגת כל תא","מצב שבו שתי מוטציות יחדיו קטלניות אך כל אחת לבד לא","ניתוח","חיסון"],a:1,e:"PARP inhibitors + BRCA mutation: תא סרטני לא יכול לתקן DNA."},
+{l:4,t:"ביולוגיה",q:"מה הוא ה-Hayflick limit?",o:["גבול גובה תא","מספר חלוקות תא מוגבל (~50) לפני זקנה","ריכוז מקסימלי של ATP","מהירות שעתוק"],a:1,e:"לאחר ~50 חלוקות טלומרים מתקצרים, התא נכנס לסנסנס."},
+{l:4,t:"ביולוגיה",q:"מה הוא ה-unfolded protein response (UPR)?",o:["תהליך עיכול","מנגנון תגובה ל-stress ב-ER","שכפול DNA","חלוקת גרעין"],a:1,e:"UPR מופעל כאשר ה-ER עמוס בחלבונים לא מקופלים."},
+
+// ══════════════════════════════════════════════════════════
+// CHEMISTRY – LEVELS 1-4
+// ══════════════════════════════════════════════════════════
 {l:1,t:"כימיה",q:"מה הוא H₂O?",o:["מלח","מים","סוכר","חמצן"],a:1,e:"H₂O הוא נוסחת המים."},
 {l:1,t:"כימיה",q:"כמה יסודות יש בנוסחה CO₂?",o:["1","2","3","4"],a:1,e:"CO₂: פחמן (C) וחמצן (O) – 2 יסודות."},
 {l:1,t:"כימיה",q:"מה הסמל הכימי של זהב?",o:["Go","Gd","Au","Ag"],a:2,e:"Au מהלטינית Aurum."},
 {l:1,t:"כימיה",q:"מה הסמל הכימי של נתרן?",o:["Na","N","Nt","So"],a:0,e:"Na מהלטינית Natrium."},
-{l:1,t:"כימיה",q:"מהו ה-pH של מים נייטרלים?",o:["0","7","14","1"],a:1,e:"pH=7 הוא נייטרלי. מתחת ל-7 חומצי, מעל 7 בסיסי."},
+{l:1,t:"כימיה",q:"מהו ה-pH של מים נייטרלים?",o:["0","7","14","1"],a:1,e:"pH=7 הוא נייטרלי."},
 {l:1,t:"כימיה",q:"מה הוא האטום?",o:["מולקולה","חלקיק יסודי של יסוד","חיידק","סלע"],a:1,e:"האטום הוא היחידה הקטנה ביותר של יסוד."},
 {l:1,t:"כימיה",q:"כמה פרוטונים יש במימן?",o:["0","1","2","3"],a:1,e:"מימן הוא היסוד הפשוט ביותר עם פרוטון אחד."},
 {l:1,t:"כימיה",q:"מהי הנוסחה של מלח בישול?",o:["KCl","NaCl","CaCl₂","MgCl"],a:1,e:"NaCl – נתרן כלורי = מלח שולחן."},
-{l:1,t:"כימיה",q:"מה הם יונים?",o:["אטומים נייטרלים","אטומים עם מטען","מולקולות","פרוטונים"],a:1,e:"יון הוא אטום שקיבל/איבד אלקטרון – בעל מטען."},
+{l:1,t:"כימיה",q:"מה הם יונים?",o:["אטומים נייטרלים","אטומים עם מטען","מולקולות","פרוטונים"],a:1,e:"יון הוא אטום שקיבל/איבד אלקטרון."},
 {l:1,t:"כימיה",q:"מה הוא גז האצולה?",o:["מימן","חמצן","ארגון","חנקן"],a:2,e:"ארגון הוא גז אציל – לא מגיב עם כמעט שום חומר."},
-{l:1,t:"פיזיקה",q:"מה יחידת המדידה של כוח?",o:["ג'אול","ניוטון","ואט","אמפר"],a:1,e:"ניוטון (N) = kg·m/s². על שם יצחק ניוטון."},
+{l:1,t:"כימיה",q:"מה הסמל הכימי של ברזל?",o:["Br","Fr","Fe","Ir"],a:2,e:"Fe מהלטינית Ferrum."},
+{l:1,t:"כימיה",q:"מהי הנוסחה של גלוקוז?",o:["C₆H₁₂O₆","CH₄","C₂H₅OH","H₂SO₄"],a:0,e:"גלוקוז C₆H₁₂O₆ הוא סוכר פשוט, מקור אנרגיה לתאים."},
+{l:1,t:"כימיה",q:"מה הוא חמצן?",o:["מתכת","גז חיוני לנשימה","נוזל","חומצה"],a:1,e:"חמצן (O₂) הוא גז דו-אטומי חיוני לנשימה ולבעירה."},
+{l:2,t:"כימיה",q:"מה הוא קשר קוולנטי?",o:["העברת אלקטרון","שיתוף אלקטרונים","קשר יוני","קשר מימן"],a:1,e:"בקשר קוולנטי שני אטומים חולקים זוג אלקטרונים."},
+{l:2,t:"כימיה",q:"מה הוא שיווי משקל כימי?",o:["תגובה חד-כיוונית","הריכוזים לא משתנים","אנרגיה אפסית","תגובה עצרה"],a:1,e:"בשיווי משקל: קצב תגובה קדימה = קצב תגובה הפוכה."},
+{l:2,t:"כימיה",q:"מה הוא חמצון?",o:["קבלת אלקטרונים","איבוד אלקטרונים","קשר קוולנטי","הידוק חומרים"],a:1,e:"חמצון = איבוד אלקטרונים (OIL – Oxidation Is Loss)."},
+{l:2,t:"כימיה",q:"מה הוא מול?",o:["יחידת מסה","יחידת נפח","6.02×10²³ חלקיקים","כמות חום"],a:2,e:"מול = מספר אבוגדרו: 6.022×10²³ יחידות של חומר."},
+{l:2,t:"כימיה",q:"מה הוא חוק שימור המסה?",o:["מסה יכולה להיווצר","סך מסת תוצרים = מסת מגיבים","מסה אובדת בחום","חוק של ניוטון"],a:1,e:"בתגובה כימית סגורה המסה הכוללת נשמרת."},
+{l:2,t:"כימיה",q:"מה הם חומצות אמינו?",o:["שומנים","אבני הבניין של חלבונים","פחמימות","ויטמינים"],a:1,e:"20 חומצות אמינו שונות מרכיבות את החלבונים בגוף."},
+{l:2,t:"כימיה",q:"מה הוא ריאקציית חומצה-בסיס?",o:["בעירה","נטרול, יוצרת מלח ומים","חמצון בלבד","ריאקציית שרשרת"],a:1,e:"חומצה + בסיס → מלח + מים (נטרול)."},
+{l:3,t:"כימיה",q:"מה הוא אנרגיית גיבס?",o:["שינוי צבע","מדד לספונטניות תגובה","מהירות תגובה","אנרגיית חום"],a:1,e:"ΔG = ΔH - TΔS. אם ΔG < 0 התגובה ספונטנית."},
+{l:3,t:"כימיה",q:"מה הוא אנטרופיה?",o:["אנרגיה","מסה","מדד לאי-סדר במערכת","נפח"],a:2,e:"S = k·ln(W). אנטרופיה מדדת מספר מצבים מיקרוסקופיים."},
+{l:3,t:"כימיה",q:"מה הם אורביטלים?",o:["מסלולים מוגדרים","אזורי הסתברות למיקום אלקטרון","חלקיקים","גלים"],a:1,e:"אורביטלים (s, p, d, f) מתארים הסתברות מיקום אלקטרון."},
+{l:3,t:"כימיה",q:"מה הוא עיקרון Le Chatelier?",o:["חום נשמר","מערכת מגיבה לשינוי חיצוני על ידי הפחתת השפעתו","אנרגיה אינסופית","גזים אינם מגיבים"],a:1,e:"כאשר שיווי המשקל מופר, המערכת מתנגדת לשינוי."},
+{l:3,t:"כימיה",q:"מה הוא קשר מימן?",o:["קשר קוולנטי","אינטראקציה בין H לבין אלקטרונגטיב","קשר יוני","Van der Waals"],a:1,e:"קשר מימן: H קשור ל-N, O, או F – משפיע על נקודת רתיחה."},
+{l:3,t:"כימיה",q:"מה הוא ריאקציית SN2?",o:["תגובה גרעינית חד-שלבית","תגובת בעירה","תגובת חומצה","תגובת רדיקל"],a:0,e:"SN2: נוקלאופיל תוקף מגב ל-LG בתגובה חד-שלבית עם היפוך סטראוכימיה."},
+{l:4,t:"כימיה",q:"מה הוא Nernst equation?",o:["E = E° - RT/nF·ln(Q)","E = ΔH - TΔS","E = hf","E = ½mv²"],a:0,e:"משוואת נרנסט: E = E° - (RT/nF)ln(Q). מתקנת פוטנציאל לא-סטנדרטי."},
+{l:4,t:"כימיה",q:"מה הוא DFT (Density Functional Theory)?",o:["ניסוי מעשי","שיטה חישובית לפתרון משוואת שרדינגר לרב-אלקטרונים","ספקטרוסקופיה","NMR"],a:1,e:"DFT מחליפה פונקציית גל רב-גופית בצפיפות אלקטרונים ρ(r)."},
+{l:4,t:"כימיה",q:"מה הוא ה-Marcus theory?",o:["תיאוריה לגל","תיאוריה להעברת אלקטרונים בין מולקולות","תגובת שרשרת","קינטיקה של גזים"],a:1,e:"Marcus theory: ΔG‡ = (ΔG° + λ)²/4λ. כמות בשינוי קוורדינציה."},
+
+// ══════════════════════════════════════════════════════════
+// PHYSICS – LEVELS 1-4
+// ══════════════════════════════════════════════════════════
+{l:1,t:"פיזיקה",q:"מה יחידת המדידה של כוח?",o:["ג'אול","ניוטון","ואט","אמפר"],a:1,e:"ניוטון (N) = kg·m/s²."},
 {l:1,t:"פיזיקה",q:"מה הוא כוח הכבידה?",o:["כוח מגנטי","כוח משיכה בין מסות","כוח חשמלי","חיכוך"],a:1,e:"כבידה: כוח משיכה בין גופים בעלי מסה."},
 {l:1,t:"פיזיקה",q:"מה היחידה של אנרגיה?",o:["ניוטון","ואט","ג'אול","פסקל"],a:2,e:"ג'אול (J) היא יחידת האנרגיה ב-SI."},
 {l:1,t:"פיזיקה",q:"מה הוא מגנט?",o:["מוליך חשמל","חומר משיכה ברזל","מקור אנרגיה","גז"],a:1,e:"מגנט יוצר שדה מגנטי ומושך חומרים פרומגנטיים."},
@@ -593,94 +395,235 @@ const ALL = [
 {l:1,t:"פיזיקה",q:"מה הוא חוק ניוטון הראשון?",o:["F=ma","עצם בתנועה ממשיך בתנועה","אנרגיה נשמרת","משיכת כבידה"],a:1,e:"חוק האינרציה: גוף ממשיך במצבו אלא אם כוח חיצוני פועל עליו."},
 {l:1,t:"פיזיקה",q:"מה הוא מעגל חשמלי?",o:["נוסחה","נתיב זרם חשמלי","כלי מדידה","סוג של אנרגיה"],a:1,e:"מעגל חשמלי: נתיב סגור שזרם חשמלי יכול לעבור בו."},
 {l:1,t:"פיזיקה",q:"מה ההבדל בין מסה למשקל?",o:["אותו דבר","מסה: כמות חומר; משקל: כוח כבידה","מסה גדולה יותר","משקל גדול יותר"],a:1,e:"מסה: kg. משקל: כוח הכבידה הפועל על המסה (N)."},
-{l:2,t:"ביולוגיה",q:"מה הוא DNA?",o:["חלבון","חומצת גרעין נושאת מידע גנטי","שומן","פחמימה"],a:1,e:"DNA נושא את המידע הגנטי בצורת רצף בסיסים."},
-{l:2,t:"ביולוגיה",q:"מה הוא אוסמוזה?",o:["העברת חום","תנועת מים דרך ממברנה חדירה למחצה","חלוקת תא","ייצור אנרגיה"],a:1,e:"מים עוברים מריכוז נמוך לגבוה של חומר מומס דרך ממברנה."},
-{l:2,t:"ביולוגיה",q:"מה הוא אנזים?",o:["פחמימה","שומן","קטליזטור ביולוגי","ויטמין"],a:2,e:"אנזים מאיץ תגובות כימיות ללא שהוא משתנה עצמו."},
-{l:2,t:"ביולוגיה",q:"מה הוא מיטוזה?",o:["מוות תאי","חלוקה מינית","חלוקה המייצרת 2 תאים זהים","ייצור חלבון"],a:2,e:"במיטוזה תא אם מתחלק לשני תאי בת עם DNA זהה."},
-{l:2,t:"ביולוגיה",q:"מה הוא RNA שליח (mRNA)?",o:["תבנית DNA","מולקולה המעבירה מידע מה-DNA לריבוזום","אנזים","ממברנה"],a:1,e:"mRNA מעתיק את המידע מה-DNA ומוביל אותו לריבוזומים לסינתזת חלבון."},
-{l:2,t:"ביולוגיה",q:"מה הוא ה-ATP?",o:["חלבון","שומן","מולקולת האנרגיה של התא","ויטמין"],a:2,e:"ATP (אדנוזין טריפוספט) הוא 'מטבע האנרגיה' התאי."},
-{l:2,t:"ביולוגיה",q:"מה ההבדל בין תאים פרוקריוטיים לאיקריוטיים?",o:["גודל בלבד","לפרוקריוטים אין גרעין ממברנטי","אוקריוטים חסרי DNA","פרוקריוטים רב-תאיים"],a:1,e:"חיידקים פרוקריוטיים – ללא גרעין ממברנטי. אוקריוטים (כמו תאי אדם) – עם גרעין."},
-{l:2,t:"ביולוגיה",q:"מה הוא מיאוזה?",o:["חלוקה ל-2 תאים זהים","חלוקה ל-4 תאים עם מחצית כרומוזומים","מוות תאי","שכפול DNA"],a:1,e:"מיאוזה מייצרת 4 תאי מין (גמטות) עם n כרומוזומים."},
-{l:2,t:"כימיה",q:"מה הוא קשר קוולנטי?",o:["העברת אלקטרון","שיתוף אלקטרונים","קשר יוני","קשר מימן"],a:1,e:"בקשר קוולנטי שני אטומים חולקים זוג אלקטרונים."},
-{l:2,t:"כימיה",q:"מה הוא שיווי משקל כימי?",o:["תגובה חד-כיוונית","הריכוזים לא משתנים","אנרגיה אפסית","תגובה עצרה"],a:1,e:"בשיווי משקל: קצב תגובה קדימה = קצב תגובה הפוכה, ריכוזים יציבים."},
-{l:2,t:"כימיה",q:"מה הוא חמצון?",o:["קבלת אלקטרונים","איבוד אלקטרונים","קשר קוולנטי","הידוק חומרים"],a:1,e:"חמצון = איבוד אלקטרונים (OIL – Oxidation Is Loss)."},
-{l:2,t:"כימיה",q:"מה הוא מול?",o:["יחידת מסה","יחידת נפח","6.02×10²³ חלקיקים","כמות חום"],a:2,e:"מול = מספר אבוגדרו: 6.022×10²³ יחידות של חומר."},
-{l:2,t:"כימיה",q:"מה הוא חוק שימור המסה?",o:["מסה יכולה להיווצר","סך מסת תוצרים = מסת מגיבים","מסה אובדת בחום","חוק של ניוטון"],a:1,e:"בתגובה כימית סגורה המסה הכוללת נשמרת."},
-{l:2,t:"כימיה",q:"מה הוא pH?",o:["ריכוז חמצן","מדד חומציות/בסיסיות","טמפרטורה","לחץ"],a:1,e:"pH = -log[H⁺]. pH<7 חומצי, pH>7 בסיסי, pH=7 נייטרלי."},
-{l:2,t:"כימיה",q:"מה הם חומצות אמינו?",o:["שומנים","אבני הבניין של חלבונים","פחמימות","ויטמינים"],a:1,e:"20 חומצות אמינו שונות מרכיבות את החלבונים בגוף."},
+{l:1,t:"פיזיקה",q:"מה מהירות האור בוואקום?",o:["300,000 מ/ש","300,000 קמ/ש","300,000,000 מ/ש","30,000 קמ/ש"],a:2,e:"מהירות האור: c ≈ 3×10⁸ מ/ש."},
+{l:1,t:"פיזיקה",q:"מה הוא כוח החיכוך?",o:["כוח המשיכה לכדור הארץ","כוח המתנגד לתנועה","כוח מגנטי","לחץ"],a:1,e:"חיכוך: כוח המתנגד לתנועה יחסית בין משטחים."},
 {l:2,t:"פיזיקה",q:"מה הוא חוק אוהם?",o:["P=IV","F=ma","V=IR","E=mc²"],a:2,e:"V=IR: מתח = זרם × התנגדות."},
 {l:2,t:"פיזיקה",q:"מה הוא אנרגיה קינטית?",o:["אנרגיית מיקום","אנרגיית תנועה","אנרגיית חום","אנרגיה פוטנציאלית"],a:1,e:"Ek = ½mv². תלויה במסה ובמהירות."},
-{l:2,t:"פיזיקה",q:"מה הוא עיקרון אי-הוודאות של היזנברג?",o:["לא ניתן למדוד כלום","לא ניתן לדעת במדויק מיקום ותנע בו-זמנית","האלקטרון מסתובב","אנרגיה נשמרת"],a:1,e:"Δx·Δp ≥ ℏ/2: ככל שנדייק במיקום, כך ייגדל חוסר הוודאות בתנע."},
-{l:2,t:"פיזיקה",q:"מה הוא גל אלקטרומגנטי?",o:["גל מכני","הפרעה בשדות חשמלי ומגנטי","גל קול","גל מים"],a:1,e:"גלים אלקטרומגנטיים (אור, רדיו, UV) לא זקוקים לתווך להתפשטות."},
-{l:2,t:"פיזיקה",q:"מה הוא חוק שימור האנרגיה?",o:["אנרגיה נוצרת מאין","אנרגיה נהרסת בחום","אנרגיה לא נוצרת ולא נהרסת","אנרגיה ניתן לייצר"],a:2,e:"אנרגיה מתמירה בין צורות (קינטית, פוטנציאלית, חום) אך לא נוצרת מאפס."},
+{l:2,t:"פיזיקה",q:"מה הוא עיקרון אי-הוודאות של היזנברג?",o:["לא ניתן למדוד כלום","לא ניתן לדעת במדויק מיקום ותנע בו-זמנית","האלקטרון מסתובב","אנרגיה נשמרת"],a:1,e:"Δx·Δp ≥ ℏ/2: ככל שנדייק במיקום, יגדל חוסר הוודאות בתנע."},
+{l:2,t:"פיזיקה",q:"מה הוא גל אלקטרומגנטי?",o:["גל מכני","הפרעה בשדות חשמלי ומגנטי","גל קול","גל מים"],a:1,e:"גלים אלקטרומגנטיים (אור, רדיו, UV) לא זקוקים לתווך."},
+{l:2,t:"פיזיקה",q:"מה הוא חוק שימור האנרגיה?",o:["אנרגיה נוצרת מאין","אנרגיה נהרסת בחום","אנרגיה לא נוצרת ולא נהרסת","אנרגיה ניתן לייצר"],a:2,e:"אנרגיה מתמירה בין צורות אך לא נוצרת מאפס."},
 {l:2,t:"פיזיקה",q:"מה עיקרון ארכימדס?",o:["F=ma","גוף בנוזל מקבל כוח ציפה = משקל הנוזל שעקר","V=IR","E=mc²"],a:1,e:"כוח הציפה שווה למשקל הנוזל שהגוף עוקר."},
-{l:3,t:"ביולוגיה",q:"מה הוא אפיגנטיקה?",o:["מוטציות DNA","שינויים בביטוי גנטי ללא שינוי DNA","חלוקת תאים","תורת האבולוציה"],a:1,e:"אפיגנטיקה: מיתילציה של DNA והיסטונים משנה ביטוי גנים ללא שינוי רצף."},
-{l:3,t:"ביולוגיה",q:"מה הוא פוטנציאל הפעולה?",o:["כיווץ שריר","הפולס החשמלי בנוירון","סינתזת חלבון","חלוקת תא"],a:1,e:"דה-פולריזציה ורה-פולריזציה של ממברנת נוירון מאפשרות העברת אותות."},
-{l:3,t:"ביולוגיה",q:"מה הם אנטיגנים?",o:["נוגדנים","מולקולות שמפעילות תגובה חיסונית","אנזימים","הורמונים"],a:1,e:"אנטיגן: מולקולה זרה שהמערכת החיסונית מזהה ותוקפת."},
-{l:3,t:"ביולוגיה",q:"מה הוא מחזור קרבס?",o:["מחזור חנקן","מחזור קרבון","סדרת תגובות במיטוכונדריה המייצרות ATP","סינתזת DNA"],a:2,e:"מחזור קרבס (TCA) במטריקס המיטוכונדריאלי מייצר NADH, FADH₂ ו-GTP."},
-{l:3,t:"ביולוגיה",q:"מה הם טלומרים?",o:["גנים מרכזיים","קצות הכרומוזומים","ריבוזומים","DNA מעגלי"],a:1,e:"טלומרים: רצפי DNA חוזרים בקצות הכרומוזומים. מתקצרים עם כל חלוקה."},
-{l:3,t:"ביולוגיה",q:"מה הוא ה-CRISPR-Cas9?",o:["סוג וירוס","שיטת עריכת גנום","חלבון מבני","מעכב מטבולי"],a:1,e:"CRISPR-Cas9 מאפשר עריכה מדויקת של DNA בעזרת RNA מנחה."},
-{l:3,t:"ביולוגיה",q:"מה הוא אפופטוזיס?",o:["חלוקת תאים","מוות תאי מתוכנן","מוטציה","זיהום"],a:1,e:"אפופטוזיס: מוות תאי מבוקר ומתוכנן – חיוני להתפתחות ולמניעת סרטן."},
-{l:3,t:"כימיה",q:"מה הוא אנרגיית גיבס?",o:["שינוי צבע","מדד לספונטניות תגובה","מהירות תגובה","אנרגיית חום"],a:1,e:"ΔG = ΔH - TΔS. אם ΔG < 0 התגובה ספונטנית."},
-{l:3,t:"כימיה",q:"מה הוא אנטרופיה?",o:["אנרגיה","מסה","מדד לאי-סדר במערכת","נפח"],a:2,e:"S = k·ln(W). אנטרופיה מדדת מספר מצבים מיקרוסקופיים של מערכת."},
-{l:3,t:"כימיה",q:"מה הם אורביטלים?",o:["מסלולים מוגדרים","אזורי הסתברות למיקום אלקטרון","חלקיקים","גלים"],a:1,e:"אורביטלים (s, p, d, f) מתארים הסתברות מיקום אלקטרון סביב גרעין."},
-{l:3,t:"כימיה",q:"מה הוא עיקרון Le Chatelier?",o:["חום נשמר","מערכת מגיבה לשינוי חיצוני על ידי הפחתת השפעתו","אנרגיה אינסופית","גזים אינם מגיבים"],a:1,e:"כאשר שיווי המשקל מופר, המערכת מתנגדת לשינוי ושואפת לשיווי משקל חדש."},
-{l:3,t:"כימיה",q:"מה הוא קשר מימן?",o:["קשר קוולנטי","אינטראקציה בין H לבין אלקטרונגטיב","קשר יוני","Van der Waals"],a:1,e:"קשר מימן: H קשור ל-N, O, או F – משפיע על נקודת רתיחה ומבנה DNA."},
 {l:3,t:"פיזיקה",q:"מה הוא אפקט דופלר?",o:["שינוי אמפליטודת גל","שינוי תדר גל בגלל תנועה יחסית","החזרת גלים","קיטוב"],a:1,e:"האמבולנס מתקרב – שמעת גבוה יותר. מתרחק – נמוך יותר."},
 {l:3,t:"פיזיקה",q:"מה אומרת תורת היחסות הפרטית?",o:["כבידה מעקמת מרחב-זמן","מהירות האור זהה לכל המתבוננים","כל תנועה יחסית לאתר","גלי כבידה"],a:1,e:"אינשטיין (1905): מהירות האור c קבועה, זמן ואורך מתכווצים עם מהירות."},
 {l:3,t:"פיזיקה",q:"מה הוא פוטון?",o:["חלקיק מסה","קוונטום של קרינה אלקטרומגנטית","אלקטרון","נוטרינו"],a:1,e:"פוטון: E = hf. חסר מסה סטטית אך נושא אנרגיה ותנע."},
 {l:3,t:"פיזיקה",q:"מה הם גלי כבידה?",o:["גלי קול","גלי אור","גלי מים","עיוותים במרחב-זמן הנפלטים מגופים מאיצים"],a:3,e:"LIGO גילה גלי כבידה ב-2015 ממיזוג חורים שחורים."},
-{l:4,t:"ביולוגיה",q:"מה הוא signal transduction pathway של MAPK?",o:["העברת גן","סדרת זרחון חלבוני מ-Ras לאקטיבציה של ERK","מחזור ATP","טרנסקריפציה"],a:1,e:"MAPK/ERK: Ras→Raf→MEK→ERK. פועל בתגובה לגורמי גדילה."},
-{l:4,t:"כימיה",q:"מה הוא Nernst equation?",o:["E = E° - RT/nF·ln(Q)","E = ΔH - TΔS","E = hf","E = ½mv²"],a:0,e:"משוואת נרנסט: E = E° - (RT/nF)ln(Q). מתקנת פוטנציאל לא-סטנדרטי."},
 {l:4,t:"פיזיקה",q:"מה הוא ה-Berry phase?",o:["פאזה רגילה","פאזה גיאומטרית שגל קוונטי רוכש במעגל פרמטרי","עיוות מרחב","אנרגיית ריק"],a:1,e:"פאזת ברי: φ = i∮⟨ψ|∇ψ⟩·dR. חיונית בה-quantum Hall effect."},
-{l:4,t:"כימיה",q:"מה הוא DFT (Density Functional Theory)?",o:["ניסוי מעשי","שיטה חישובית לפתרון משוואת שרדינגר לרב-אלקטרונים","ספקטרוסקופיה","NMR"],a:1,e:"DFT מחליפה פונקציית גל רב-גופית בצפיפות אלקטרונים ρ(r)."},
 {l:4,t:"פיזיקה",q:"מה הוא ה-Casimir effect?",o:["חיכוך","כוח משיכה בין לוחות מוליכים בגלל תנודות ריק","שדה מגנטי","גל קוונטי"],a:1,e:"אנרגיית אפס (ZPE) גורמת ללחץ ריק; בין לוחות קרובים → כוח משיכה."},
-{l:4,t:"ביולוגיה",q:"מה הוא synthetic lethality בסרטן?",o:["תרופה הורגת כל תא","מצב שבו שתי מוטציות יחדיו קטלניות אך כל אחת לבד לא","ניתוח","חיסון"],a:1,e:"PARP inhibitors + BRCA mutation: תא סרטני לא יכול לתקן DNA."}
+{l:4,t:"פיזיקה",q:"מה הוא ה-Lagrangian בפיזיקה קלאסית?",o:["כוח כפול תאוצה","L = T - V (אנרגיה קינטית פחות פוטנציאלית)","משוואת גל","אנרגיה חשמלית"],a:1,e:"הלגרנג'יאן L=T-V מניב משוואות תנועה דרך עיקרון הפעולה."},
+
+// ══════════════════════════════════════════════════════════
+// MATHEMATICS – LEVELS 1-4
+// ══════════════════════════════════════════════════════════
+{l:1,t:"מתמטיקה",q:"כמה זה 15 × 8?",o:["110","120","125","130"],a:1,e:"15 × 8 = 120."},
+{l:1,t:"מתמטיקה",q:"מה הוא שורש ריבועי של 144?",o:["11","12","13","14"],a:1,e:"√144 = 12, כי 12² = 144."},
+{l:1,t:"מתמטיקה",q:"מה הוא ה-LCM של 4 ו-6?",o:["10","12","24","8"],a:1,e:"המכנה המשותף הקטן ביותר של 4 ו-6 הוא 12."},
+{l:1,t:"מתמטיקה",q:"מה הוא ה-GCD של 18 ו-24?",o:["2","4","6","8"],a:2,e:"המחלק המשותף הגדול ביותר של 18 ו-24 הוא 6."},
+{l:1,t:"מתמטיקה",q:"מה הוא 3³?",o:["6","9","27","81"],a:2,e:"3³ = 3 × 3 × 3 = 27."},
+{l:1,t:"מתמטיקה",q:"מה האחוז של 25 מתוך 200?",o:["10%","12.5%","15%","20%"],a:1,e:"25/200 × 100 = 12.5%."},
+{l:1,t:"מתמטיקה",q:"מה היקף מעגל עם רדיוס 7?",o:["14π","7π","49π","21π"],a:0,e:"היקף = 2πr = 2π×7 = 14π."},
+{l:1,t:"מתמטיקה",q:"כמה זווית יש במשולש?",o:["180°","270°","360°","90°"],a:0,e:"סכום הזוויות במשולש = 180°."},
+{l:1,t:"מתמטיקה",q:"מה הוא מספר ראשוני?",o:["מחולק ב-2","מתחלק רק ב-1 ובעצמו","מספר זוגי","מספר גדול"],a:1,e:"מספר ראשוני: מתחלק רק ב-1 ובעצמו. דוגמאות: 2, 3, 5, 7, 11."},
+{l:1,t:"מתמטיקה",q:"מה הוא 0.75 כשבר?",o:["1/4","3/4","2/3","1/2"],a:1,e:"0.75 = 75/100 = 3/4."},
+{l:1,t:"מתמטיקה",q:"מה שטח ריבוע בצלע 9?",o:["36","45","81","18"],a:2,e:"שטח ריבוע = צלע² = 9² = 81."},
+{l:1,t:"מתמטיקה",q:"כמה זה −5 + 12?",o:["−7","7","17","−17"],a:1,e:"−5 + 12 = 7."},
+{l:1,t:"מתמטיקה",q:"מה הוא מספר 2⁸?",o:["128","256","64","512"],a:1,e:"2⁸ = 256."},
+{l:1,t:"מתמטיקה",q:"מה ממוצע של: 4, 8, 12, 16?",o:["8","10","12","9"],a:1,e:"(4+8+12+16)/4 = 40/4 = 10."},
+{l:1,t:"מתמטיקה",q:"כמה זה 1/3 + 1/6?",o:["1/3","1/2","2/9","1/9"],a:1,e:"1/3 + 1/6 = 2/6 + 1/6 = 3/6 = 1/2."},
+{l:2,t:"מתמטיקה",q:"פתור: 2x + 5 = 17",o:["x=4","x=6","x=5","x=7"],a:1,e:"2x = 12, x = 6."},
+{l:2,t:"מתמטיקה",q:"מה הוא log₂(64)?",o:["4","5","6","8"],a:2,e:"log₂(64) = 6, כי 2⁶ = 64."},
+{l:2,t:"מתמטיקה",q:"מה הוא הנגזרת של x³?",o:["3x","3x²","x²","2x³"],a:1,e:"d/dx(x³) = 3x²."},
+{l:2,t:"מתמטיקה",q:"פתור x² - 5x + 6 = 0",o:["x=2 ו-x=3","x=1 ו-x=6","x=−2 ו-x=−3","x=2 ו-x=−3"],a:0,e:"(x-2)(x-3)=0 → x=2 או x=3."},
+{l:2,t:"מתמטיקה",q:"מה האינטגרל של 2x?",o:["x²+C","2x²+C","x+C","2+C"],a:0,e:"∫2x dx = x² + C."},
+{l:2,t:"מתמטיקה",q:"מה הוא sin(30°)?",o:["0.5","√3/2","1","√2/2"],a:0,e:"sin(30°) = 1/2 = 0.5."},
+{l:2,t:"מתמטיקה",q:"מה הוא cos(60°)?",o:["√3/2","1/2","0","1"],a:1,e:"cos(60°) = 1/2."},
+{l:2,t:"מתמטיקה",q:"מה הוא משפט פיתגורס?",o:["a+b=c","a²+b²=c²","a×b=c²","2a+b=c"],a:1,e:"במשולש ישר זווית: a² + b² = c² (c = יתר)."},
+{l:2,t:"מתמטיקה",q:"מה הוא וקטור?",o:["נקודה","גודל עם כיוון","שטח","זווית"],a:1,e:"וקטור הוא גודל המוגדר על ידי עוצמה וכיוון."},
+{l:2,t:"מתמטיקה",q:"מהו הביטוי (a+b)²?",o:["a²+b²","a²+2ab+b²","a²+ab+b²","2a²+2b²"],a:1,e:"(a+b)² = a² + 2ab + b² – זהות אלגברית."},
+{l:2,t:"מתמטיקה",q:"מה הוא הסדרה החשבונית 2, 5, 8, 11... האיבר ה-10?",o:["27","29","31","33"],a:1,e:"aₙ = 2 + (n-1)·3. a₁₀ = 2 + 27 = 29."},
+{l:2,t:"מתמטיקה",q:"מהי שיפוע הישר y = 3x − 7?",o:["−7","3","7","−3"],a:1,e:"בצורת y=mx+b, m הוא השיפוע. כאן m=3."},
+{l:3,t:"מתמטיקה",q:"מה הגבול: lim(x→∞) (3x²+1)/(x²-2)?",o:["0","1","3","∞"],a:2,e:"מחלקים ב-x²: (3+1/x²)/(1-2/x²) → 3/1 = 3."},
+{l:3,t:"מתמטיקה",q:"מה הוא אינטגרל מסוים ∫₀¹ x² dx?",o:["1/4","1/3","1/2","1"],a:1,e:"[x³/3]₀¹ = 1/3 - 0 = 1/3."},
+{l:3,t:"מתמטיקה",q:"מה הוא מטריצה אורתוגונלית?",o:["מטריצה ריבועית","מטריצה ש-AᵀA = I","מטריצה עם יחסה 0","מטריצה סימטרית"],a:1,e:"מטריצה A אורתוגונלית אם Aᵀ = A⁻¹, כלומר AᵀA = I."},
+{l:3,t:"מתמטיקה",q:"מה הוא מספר e?",o:["3.14159","2.71828","1.41421","1.61803"],a:1,e:"e ≈ 2.71828 – בסיס הלוגריתם הטבעי."},
+{l:3,t:"מתמטיקה",q:"מה הוא כלל השרשרת בחדו\"א?",o:["d/dx(f+g)=f'+g'","d/dx(f(g(x)))=f'(g(x))·g'(x)","d/dx(fg)=f'g+fg'","d/dx(f/g)=(f'g-fg')/g²"],a:1,e:"כלל השרשרת לנגזרת של פונקציה מורכבת: (f∘g)' = f'(g)·g'."},
+{l:3,t:"מתמטיקה",q:"מה הוא מספר מרוכב?",o:["שורש שלילי","מספר מהצורה a+bi כש-i=√-1","מספר ראשוני גדול","נקודה במרחב"],a:1,e:"מספר מרוכב: a+bi כאשר i=√(−1)."},
+{l:4,t:"מתמטיקה",q:"מה הוא משפט ריימן-רוך?",o:["משפט גיאומטרי","קשר בין חלוקים מרוכבים לטופולוגיה של עקום","חישוב אינטגרל","משפט סטטיסטי"],a:1,e:"Riemann-Roch: l(D) - l(K-D) = deg(D) - g + 1 על עקומים אלגבריים."},
+{l:4,t:"מתמטיקה",q:"מה הוא ה-Fourier transform?",o:["שינוי בסיס בווקטורים","פירוק פונקציה לתדרים","חישוב נגזרת","פתרון ODE"],a:1,e:"טרנספורם פורייה: F(ω) = ∫f(t)e^{-iωt}dt. מעביר לתחום תדרים."},
+{l:4,t:"מתמטיקה",q:"מה הוא ה-Banach space?",o:["מרחב עם 2 ממדים","מרחב נורמי שלם","חבורת לי","מטריצה אינסופית"],a:1,e:"מרחב בנך: מרחב וקטורי נורמי שלם (כל סדרת קושי מתכנסת)."},
+
+// ══════════════════════════════════════════════════════════
+// ADVANCED MATH – LEVELS 1-4
+// ══════════════════════════════════════════════════════════
+{l:1,t:"מתמטיקה מתקדמת",q:"מה הגדרת נגזרת?",o:["שטח מתחת לגרף","שיפוע של הפונקציה בנקודה","ממוצע הפונקציה","ערך מינימלי"],a:1,e:"הנגזרת היא השיפוע (קצב שינוי) של הפונקציה בנקודה נתונה."},
+{l:1,t:"מתמטיקה מתקדמת",q:"מה האינטגרל של x?",o:["x²","x²/2 + C","2x + C","1"],a:1,e:"∫x dx = x²/2 + C."},
+{l:1,t:"מתמטיקה מתקדמת",q:"מה הוא הגבול lim(x→0) sin(x)/x?",o:["0","∞","1","לא קיים"],a:2,e:"lim(x→0) sin(x)/x = 1 – גבול בסיסי מאוד חשוב."},
+{l:1,t:"מתמטיקה מתקדמת",q:"מה הנגזרת של sin(x)?",o:["−cos(x)","cos(x)","sin(x)","−sin(x)"],a:1,e:"d/dx(sin x) = cos x."},
+{l:1,t:"מתמטיקה מתקדמת",q:"מה הנגזרת של eˣ?",o:["eˣ⁻¹","xeˣ","eˣ","1/eˣ"],a:2,e:"eˣ הוא הפונקציה היחידה שנגזרתה שווה לה עצמה."},
+{l:1,t:"מתמטיקה מתקדמת",q:"מה הוא וקטור יחידה?",o:["וקטור עם עוצמה 2","וקטור ששיפועו 1","וקטור עם גודל 1","וקטור במישור"],a:2,e:"וקטור יחידה: ‖u‖ = 1. מתקבל על ידי חלוקה בגודל הוקטור."},
+{l:2,t:"מתמטיקה מתקדמת",q:"מה הוא המכפלה הסקלרית של (1,2) ו-(3,4)?",o:["5","11","10","14"],a:1,e:"(1,2)·(3,4) = 1×3 + 2×4 = 3+8 = 11."},
+{l:2,t:"מתמטיקה מתקדמת",q:"מה הוא קבוצה פתוחה בטופולוגיה?",o:["קבוצה ריקה","קבוצה המכילה סביבה של כל נקודה","קבוצה סגורה","קבוצת מספרים ראשוניים"],a:1,e:"קבוצה פתוחה: לכל נקודה בה קיימת כדור פתוח המוכל בה."},
+{l:2,t:"מתמטיקה מתקדמת",q:"מה הוא ה-eigenvalue?",o:["מינימום של פונקציה","ערך λ כך ש-Av=λv","נגזרת מטריצה","דטרמיננטה"],a:1,e:"ערך עצמי: מספר λ כך שAv=λv לוקטור עצמי v≠0."},
+{l:2,t:"מתמטיקה מתקדמת",q:"מה הוא אינטגרל קו?",o:["אינטגרל של פונקציה בנקודה","אינטגרל של שדה לאורך עקום","נגזרת חלקית","פתרון ODE"],a:1,e:"אינטגרל קו: ∫_C F·dr – סוכם את השדה לאורך מסלול."},
+{l:3,t:"מתמטיקה מתקדמת",q:"מה הוא משפט סטוקס?",o:["∯F·dA = ∭divF dV","∮F·dr = ∬(∇×F)·dS","∫f dx = F(b)-F(a)","∇²f = 0"],a:1,e:"משפט סטוקס: האינטגרל של קרל-שדה על משטח = אינטגרל השדה על הגבול."},
+{l:3,t:"מתמטיקה מתקדמת",q:"מה הם מספרי קרדינל?",o:["מספרים ראשוניים","מספרים המתארים גדלי קבוצות","מספרים שליליים","מספרים רציונליים"],a:1,e:"קרדינליות מודדת את 'גודל' הקבוצה. קנטור הראה שיש אינסופים שונים."},
+{l:3,t:"מתמטיקה מתקדמת",q:"מה הוא ה-Laplace transform?",o:["פריקה לוקטורים","F(s) = ∫₀^∞ f(t)e^{-st}dt","נגזרת מסדר שני","ממוצע אינטגרלי"],a:1,e:"טרנספורם לפלס ממיר ODE לבעיות אלגבריות בתחום s."},
+{l:4,t:"מתמטיקה מתקדמת",q:"מה הוא משפט אי-השלמות של גדל?",o:["כל אקסיומות המתמטיקה עקביות","בכל מערכת עקבית יש טענות שלא ניתן להוכיח ולא להפריך","כל משוואה פתירה","היגיון הוא שלם"],a:1,e:"גדל (1931): בכל מערכת פורמלית עקבית מספיק חזקה יש טענות בלתי-הכרעות."},
+{l:4,t:"מתמטיקה מתקדמת",q:"מה הוא ה-Riemann hypothesis?",o:["כל מספר ראשוני הוא אי-זוגי","כל אפסים לא-טריוויאליים של ζ(s) נמצאים על הישר Re(s)=1/2","פונקציית זטא שלמה","סכום כל מספרים ראשוניים"],a:1,e:"השערת רימן (1859, לא הוכחה): אפסי פונקציית זטא על Re(s)=1/2."},
+{l:4,t:"מתמטיקה מתקדמת",q:"מה הוא ה-Navier-Stokes equation?",o:["משוואת חום","משוואת תנועה של נוזל צמיג","משוואת גל קוונטי","חוק מקסוול"],a:1,e:"נאווייה-סטוקס מתאר תנועת נוזלים; קיום פתרון חלק בתלת-מימד הוא בעיית מילניום."},
+
+// ══════════════════════════════════════════════════════════
+// ENGLISH – LEVELS 1-4
+// ══════════════════════════════════════════════════════════
+{l:1,t:"אנגלית",q:"What is the plural of 'child'?",o:["childs","childen","children","childre"],a:2,e:"'Children' is the irregular plural of 'child'."},
+{l:1,t:"אנגלית",q:"Which word means 'happy'?",o:["Sad","Joyful","Angry","Tired"],a:1,e:"'Joyful' is a synonym for 'happy'."},
+{l:1,t:"אנגלית",q:"What is the past tense of 'go'?",o:["Goed","Gone","Went","Goes"],a:2,e:"'Go' is an irregular verb. Past tense = 'went'."},
+{l:1,t:"אנגלית",q:"Which article do you use before 'elephant'?",o:["a","an","the","—"],a:1,e:"Use 'an' before words starting with a vowel sound: an elephant."},
+{l:1,t:"אנגלית",q:"What is the opposite of 'ancient'?",o:["Old","Modern","Big","Dark"],a:1,e:"'Ancient' means very old. Its opposite is 'modern' (new)."},
+{l:1,t:"אנגלית",q:"Which sentence is correct?",o:["She don't like cats","She doesn't like cats","She not likes cats","She no like cats"],a:1,e:"With 3rd person singular (she/he/it), use 'doesn't' in negatives."},
+{l:1,t:"אנגלית",q:"What does 'enormous' mean?",o:["Tiny","Average","Huge","Colorful"],a:2,e:"'Enormous' means extremely large."},
+{l:1,t:"אנגלית",q:"Which word is a noun?",o:["Quickly","Beautiful","Happiness","Run"],a:2,e:"'Happiness' is a noun (a thing/abstract concept)."},
+{l:1,t:"אנגלית",q:"Choose the correct form: 'I ___ reading now.'",o:["am","is","are","be"],a:0,e:"Present continuous with 'I': I am (I'm) reading."},
+{l:1,t:"אנגלית",q:"What is the comparative of 'good'?",o:["Gooder","More good","Better","Best"],a:2,e:"'Good' has an irregular comparative: better. Superlative: best."},
+{l:1,t:"אנגלית",q:"What does 'sufficient' mean?",o:["Too much","Not enough","Enough","Very little"],a:2,e:"'Sufficient' means enough or adequate."},
+{l:1,t:"אנגלית",q:"Which is a preposition?",o:["Run","Beautiful","Under","Quickly"],a:2,e:"'Under' is a preposition showing position/relationship."},
+{l:1,t:"אנגלית",q:"What is the plural of 'mouse' (computer)?",o:["Mouses","Mice","Mouse","Mousies"],a:0,e:"In computing context, 'mouses' is acceptable. For animals: mice."},
+{l:2,t:"אנגלית",q:"Identify the error: 'Neither the teacher nor the students was ready.'",o:["teacher","nor","students","was"],a:3,e:"With 'neither...nor', the verb agrees with the subject closest to it (students = plural → 'were')."},
+{l:2,t:"אנגלית",q:"What is a 'gerund'?",o:["Past tense verb","Verb used as a noun (-ing)","Adjective","Adverb"],a:1,e:"A gerund is a verb form ending in -ing used as a noun. E.g., 'Swimming is fun.'"},
+{l:2,t:"אנגלית",q:"Choose the correct word: 'The results were ___ than expected.'",o:["worse","worst","more bad","badder"],a:0,e:"'Worse' is the comparative of 'bad'. Superlative: worst."},
+{l:2,t:"אנגלית",q:"What does 'ambiguous' mean?",o:["Clear","Having more than one possible meaning","Ancient","Powerful"],a:1,e:"Ambiguous = open to more than one interpretation; unclear."},
+{l:2,t:"אנגלית",q:"Which sentence uses the passive voice?",o:["She wrote the letter","The letter was written by her","She writes daily","She had written it"],a:1,e:"Passive voice: subject receives the action. 'The letter was written by her.'"},
+{l:2,t:"אנגלית",q:"What is a 'subordinate clause'?",o:["A main sentence","A clause that cannot stand alone","A type of noun","A verb phrase"],a:1,e:"A subordinate (dependent) clause gives extra info but cannot stand alone. E.g., 'because it was raining'."},
+{l:2,t:"אנגלית",q:"Choose the right word: 'He has ___ friends than I do.'",o:["less","fewer","more less","lesser"],a:1,e:"Use 'fewer' with countable nouns (friends), 'less' with uncountable."},
+{l:2,t:"אנגלית",q:"What does 'meticulous' mean?",o:["Careless","Very careful about details","Generous","Hostile"],a:1,e:"Meticulous = showing great attention to detail; very precise."},
+{l:3,t:"אנגלית",q:"What is a 'dangling modifier'?",o:["A long adjective","A modifier that doesn't logically modify its intended noun","A passive clause","A double negative"],a:1,e:"E.g., 'Running down the street, the bus was missed.' — who was running? The modifier dangles."},
+{l:3,t:"אנגלית",q:"Choose: 'If I ___ you, I would apologize.'",o:["am","was","were","be"],a:2,e:"Subjunctive mood in hypothetical conditionals: 'If I were you...' (not 'was')."},
+{l:3,t:"אנגלית",q:"What does 'sycophant' mean?",o:["A scientist","A flatterer who seeks favor","A type of plant","An honest critic"],a:1,e:"Sycophant: a person who flatters powerful people to gain advantage."},
+{l:3,t:"אנגלית",q:"What is 'asyndeton'?",o:["Use of many conjunctions","Omission of conjunctions for effect","A type of metaphor","Repetition of sounds"],a:1,e:"Asyndeton omits conjunctions: 'I came, I saw, I conquered.' Creates speed and power."},
+{l:3,t:"אנגלית",q:"What is the difference between 'imply' and 'infer'?",o:["They mean the same thing","Speaker implies; listener infers","Listener implies; speaker infers","Both mean to state directly"],a:1,e:"The speaker/writer implies (suggests). The reader/listener infers (concludes)."},
+{l:3,t:"אנגלית",q:"What does 'ephemeral' mean?",o:["Eternal","Lasting only a short time","Extremely large","Deeply serious"],a:1,e:"Ephemeral = lasting for a very short time; transient."},
+{l:4,t:"אנגלית",q:"What is a 'catachresis'?",o:["A rhetorical pause","Unusual/strained use of a word or metaphor","Omission of words","Repeating a word at end of clauses"],a:1,e:"Catachresis: a striking misuse of a word, often for rhetorical effect. E.g., 'to take arms against a sea of troubles.'"},
+{l:4,t:"אנגלית",q:"In linguistics, what is 'deixis'?",o:["Word order rules","Words whose interpretation depends on context (this, here, now)","Passive voice structure","Phonetic transcription"],a:1,e:"Deictic expressions (I, you, here, now, this) require context to interpret."},
+{l:4,t:"אנגלית",q:"What is 'polysyndeton'?",o:["Absence of conjunctions","Use of many conjunctions in succession","Repeating words at clause start","A metaphor"],a:1,e:"Polysyndeton: repeated use of conjunctions. 'We lived and laughed and loved and left.'"},
+{l:4,t:"אנגלית",q:"What does 'tendentious' mean?",o:["Balanced and fair","Promoting a particular point of view; biased","Random","Scientifically rigorous"],a:1,e:"Tendentious = expressing a particular point of view; biased toward a cause."},
+
+// ══════════════════════════════════════════════════════════
+// MEDICINE – LEVELS 1-4 (MDA-based)
+// ══════════════════════════════════════════════════════════
+{l:1,t:"רפואה",q:"מהי הצלחת הראשונה שיש לבצע כאשר אדם איבד הכרה?",o:["ביצוע CPR","בדיקת דופק","הבטחת בטיחות הסביבה","מתן חמצן"],a:2,e:"עיקרון D-R-A-B-C: Danger (סכנה) הוא הצעד הראשון תמיד – לפני שניגשים לנפגע."},
+{l:1,t:"רפואה",q:"מהו קצב לחיצות החזה המומלץ במבוגר ב-CPR?",o:["60-70 לחיצות/דקה","80-90 לחיצות/דקה","100-120 לחיצות/דקה","50-60 לחיצות/דקה"],a:2,e:"מד\"א: 100-120 לחיצות בדקה בעומק 5-6 ס\"מ."},
+{l:1,t:"רפואה",q:"מה היחס בין לחיצות חזה לנשיפות ב-CPR למבוגר?",o:["15:1","30:2","20:2","10:1"],a:1,e:"30 לחיצות : 2 נשיפות. כאשר יש 2 מחיים – ניתן להחליף כל 2 דקות."},
+{l:1,t:"רפואה",q:"מה עושים כאשר נפגע נחנק ומסוגל לשעול?",o:["מבצעים הייליך","מכים בגב","מעודדים אותו לשעול בחוזקה","מתקשרים למד\"א מיד"],a:2,e:"חסימה חלקית + שיעול = הנפגע יכול לנקות בעצמו. אין להתערב, לעודד שיעול."},
+{l:1,t:"רפואה",q:"מהי הטמפרטורה שמגדירה חום גבוה (חום)? ",o:["37.0°C","37.5°C","38.0°C","39.0°C"],a:2,e:"חום מוגדר כטמפרטורת גוף של 38°C ומעלה."},
+{l:1,t:"רפואה",q:"היכן בודקים דופק חירום מהיר במבוגר?",o:["פרק כף היד","הברך","עורק הצוואר (קרוטי)","הקרסול"],a:2,e:"עורק הקרוטי בצוואר נגיש ומהיר לבדיקת דופק בחירום."},
+{l:1,t:"רפואה",q:"מה הוא המצב AVPU?",o:["שיטת נשימה","סולם להערכת מצב הכרה: Alert/Voice/Pain/Unresponsive","שיטת עצירת דימום","פרוטוקול CPR"],a:1,e:"AVPU: Alert=ער, Voice=מגיב לקול, Pain=מגיב לכאב, Unresponsive=לא מגיב."},
+{l:1,t:"רפואה",q:"כיצד מטפלים בכוויה שטחית (דרגה 1)?",o:["שמים קרם שומן","מצננים במים קרירים (לא קרח) 10-20 דקות","מניחים קרח ישירות","מנקבים שלפוחיות"],a:1,e:"כוויות שטחיות: מים קרירים (15-25°C) 10-20 דקות. אין קרח – גורם לנזק נוסף."},
+{l:1,t:"רפואה",q:"מה הסימן הכי ברור לשבר?",o:["כאב","נפיחות","עיוות או צורה לא תקינה של האיבר","חבורה"],a:2,e:"עיוות גלוי הוא הסימן הוודאי ביותר לשבר. כאב ונפיחות קיימים גם בחבטות."},
+{l:1,t:"רפואה",q:"מה עושים אם נפגע עם חשד לפציעת עמוד שדרה?",o:["מסיטים את הראש הצידה","ממהרים לשכב אותו שטוח","מייצבים את הראש והצוואר ולא זזים","אומרים לו לשבת"],a:2,e:"חשד לפציעת עמוד שדרה: ייצוב ואי תנועה עד הגעת הצוות המקצועי."},
+{l:2,t:"רפואה",q:"מהם הסימנים של התקף לב (MI)?",o:["כאב ראש + חום","לחץ/כאב בחזה, הקרנה לזרוע שמאל/לסת, קוצר נשימה, הזעה","הקאות בלבד","נמנום וחוסר אנרגיה"],a:1,e:"AMI: כאב לחץ בחזה, הקרנה לזרוע שמאל/לסת/גב, קוצר נשימה, הזעה, בחילה."},
+{l:2,t:"רפואה",q:"מה הוא מנשם 'BVM' בשימוש מד\"א?",o:["מכשיר ניטור לב","בלון + מסכה להנשמה ידנית","אמבוב","מד סוכר"],a:1,e:"BVM (Bag-Valve-Mask): בלון+שסתום+מסכה – להנשמה ידנית ללא קשר לפה."},
+{l:2,t:"רפואה",q:"כיצד מבצעים תמרון ריות ל'חסימת דרכי אוויר' בתינוק?",o:["5 לחיצות בטן + 5 מכות גב","5 מכות גב + 5 לחיצות חזה (לא בטן)","ידי היימליך כרגיל","תחובים אצבע לפה"],a:1,e:"בתינוק: 5 מכות גב (כפוף על הזרוע) ואז 5 לחיצות חזה. אין ללחוץ על הבטן!"},
+{l:2,t:"רפואה",q:"מה הוא ה-GCS (Glasgow Coma Scale) והטווח שלו?",o:["0-10","3-15","1-20","0-100"],a:1,e:"GCS מודד מצב הכרה: עיניים (1-4) + מילולי (1-5) + מוטורי (1-6) = 3-15."},
+{l:2,t:"רפואה",q:"מה עושים בחשד להיפוגליקמיה (סוכר נמוך) בחולה שעדיין מודע?",o:["נותנים אינסולין","נותנים מיץ/גלוקוז דרך הפה","מבצעים CPR","מניחים אותו לישון"],a:1,e:"היפוגליקמיה + מודע: 15-20 גרם סוכר מהיר פה (מיץ, גלוקוז). בחוסר הכרה – לא!"},
+{l:2,t:"רפואה",q:"מה הם 4 הסימנים של הלם (Shock)?",o:["חום גבוה, אדמומיות, נפיחות, כאב","עור חיוור/קר/לח, דופק מהיר/חלש, בלבול, נשימה מהירה","אישונים מורחבים, קצב לב 40, חום, הקאות","כאב חזה בלבד"],a:1,e:"הלם: עור קר-חיוור-לח, דופק >100 וחלש, שינוי מצב הכרה, נשימה מהירה."},
+{l:3,t:"רפואה",q:"מה הוא פרוטוקול MARCH בטיפול בנפגע חבלה?",o:["כלי ניטור לב","סדר עדיפויות: Massive hemorrhage, Airway, Respiration, Circulation, Hypothermia","שיטת CPR","פרוטוקול כוויות"],a:1,e:"MARCH: עצירת דימום מסיבי → דרכי אוויר → נשימה → מחזור → מניעת היפותרמיה."},
+{l:3,t:"רפואה",q:"מה הוא חסם עורקים (טורניקט) ומתי משתמשים בו?",o:["תחבושת פצע","רצועה שחוסמת זרימת דם, בדימום מסכן חיים בגפה","חבק ל-BP","חוסם ורידים לבדיקות דם"],a:1,e:"טורניקט: בדימום מסכן חיים בגפה שלא נעצר בלחץ. מניחים 5-7 ס\"מ מעל הפצע."},
+{l:3,t:"רפואה",q:"מה ה-SpO2 (סטורציה) הנורמלי?",o:["80-85%","85-90%","95-100%","70-80%"],a:2,e:"SpO2 תקין: 95-100%. מתחת ל-95% – בעיה אפשרית. מתחת ל-90% – חמור."},
+{l:3,t:"רפואה",q:"מה הוא בצקת ריאות ומה מרמז עליה?",o:["פציעת ריאה","הצטברות נוזל בשקיות הריאה, מלווה בשיעול עם ליחה ורודה/קצפית","שבר בצלע","כאב חזה בלבד"],a:1,e:"Pulmonary edema: נוזל בממשק אוויר-דם. סימנים: קוצר נשימה קשה, שיעול קצפי, רחשי ריאה."},
+{l:3,t:"רפואה",q:"מה ההבדל בין פרכוס טוניק-קלוני לאפילפסיה הממוקדת?",o:["אין הבדל","טוניק-קלוני: כל הגוף; ממוקד: חלק מהגוף, לעיתים ללא אובדן הכרה","ממוקד חמור יותר תמיד","טוניק-קלוני מהיר יותר"],a:1,e:"Grand mal (טוניק-קלוני): כל הגוף, אובדן הכרה. Focal: חלק מהגוף, תלוי במוקד."},
+{l:4,t:"רפואה",q:"מה הוא ה-ROSC וכיצד מאמתים אותו?",o:["מצב חוסר הכרה","Return of Spontaneous Circulation – מאומת על ידי דופק ו-ETCO₂ >35mmHg","שיטת CPR","פרוטוקול נשימה"],a:1,e:"ROSC: חזרת פעילות לב ספונטנית. אימות: דופק מוחשי + ETCO₂ עולה >35mmHg."},
+{l:4,t:"רפואה",q:"מה הוא פרוטוקול ACLS לטיפול ב-VF/pVT?",o:["CPR בלבד","דפיברילציה + CPR 2 דק + אדרנלין ואמיודרון לפי אלגוריתם","תרופות בלבד","ניטור ללא התערבות"],a:1,e:"VF/pVT: דפיברילציה → CPR 2 דק → בדיקת קצב → אדרנלין 1mg כל 3-5 דק → אמיודרון."},
+{l:4,t:"רפואה",q:"מה הוא הטיפול הראשוני ב-tension pneumothorax?",o:["חמצן בלבד","CPR","עצירת דימום","ניקוב מחט (needle decompression) בבית הצלע ה-2 בקו עצם הבריח"],a:3,e:"Tension pneumothorax: ניקוב מחט מיידי ב-ICS2 MCL להורדת לחץ. אחר כך chest tube."},
+{l:4,t:"רפואה",q:"מה הם הסימנים של Beck's triad בטמפונדת לב?",o:["חום, כאב, נפיחות","לחץ ורידי מוגבר, לחץ דם נמוך, קולות לב עמומים","דופק מהיר, חום, עור אדום","כאב חזה, בחילה, הקאה"],a:1,e:"Beck's triad: JVD (לחץ ורידי עולה) + Hypotension + Muffled heart sounds."}
 ];
 
-const TOPICS = ["הכל","ביולוגיה","כימיה","פיזיקה"];
-const DIFF_LABEL = {1:"קל",2:"בינוני",3:"קשה",4:"מומחה"};
-const DIFF_CLASS = {1:"easy",2:"medium",3:"hard",4:"expert"};
+const SUBJECTS_META = [
+  {name:"הכל",icon:"🔬",count:"הכל",color:"#00f5ff"},
+  {name:"ביולוגיה",icon:"🧬",count:"60+ שאלות",color:"#00ff88"},
+  {name:"כימיה",icon:"⚗️",count:"60+ שאלות",color:"#ff8800"},
+  {name:"פיזיקה",icon:"⚛️",count:"60+ שאלות",color:"#bb88ff"},
+  {name:"מתמטיקה",icon:"📐",count:"60+ שאלות",color:"#ffcc00"},
+  {name:"מתמטיקה מתקדמת",icon:"∫",count:"40+ שאלות",color:"#ff8899"},
+  {name:"אנגלית",icon:"📖",count:"60+ שאלות",color:"#00d4aa"},
+  {name:"רפואה",icon:"⚕️",count:"30+ שאלות",color:"#ff6680"}
+];
 
-// --- טעינת נתונים שמורים ---
-let savedXP = parseInt(localStorage.getItem('userXP')) || 0;
-let savedCorrect = parseInt(localStorage.getItem('userCorrect')) || 0;
-let savedWrong = parseInt(localStorage.getItem('userWrong')) || 0;
+const DIFF_LABEL={1:"קל",2:"בינוני",3:"קשה",4:"מומחה"};
+const DIFF_CLASS={1:"easy",2:"medium",3:"hard",4:"expert"};
 
-let state = {
-  xp: savedXP,
-  lvl: 1,
-  correct: savedCorrect,
-  wrong: savedWrong,
-  streak: 0,
-  difficulty: 1,
-  topic: "הכל",
-  used: new Set(),
-  answered: false,
-  current: null
+let state={
+  xp:parseInt(localStorage.getItem('userXP'))||0,
+  lvl:1,
+  correct:parseInt(localStorage.getItem('userCorrect'))||0,
+  wrong:parseInt(localStorage.getItem('userWrong'))||0,
+  streak:0,
+  difficulty:1,
+  subject:"הכל",
+  used:{},
+  answered:false,
+  current:null,
+  medicalConfirmed:false
 };
 
-function initTopics(){
-  document.getElementById("topicsRow").innerHTML = TOPICS.map(t=>
-    `<button class="topic-btn${t===state.topic?' active':''}" onclick="setTopic('${t}')">${t}</button>`
-  ).join('');
+// Build subject selector
+function buildSubjects(){
+  const grid=document.getElementById('subjectsGrid');
+  grid.innerHTML=SUBJECTS_META.map(s=>`
+    <div class="subj-card" data-subj="${s.name}" onclick="selectSubject('${s.name}')">
+      <div class="subj-icon">${s.icon}</div>
+      <div class="subj-name">${s.name}</div>
+      <div class="subj-count">${s.count}</div>
+    </div>
+  `).join('');
 }
 
-function setTopic(t){
-  state.topic=t; state.used.clear();
-  document.querySelectorAll('.topic-btn').forEach(b=>b.classList.toggle('active',b.textContent===t));
+function selectSubject(name){
+  if(name==="רפואה" && !state.medicalConfirmed){
+    document.getElementById('medModal').style.display='flex';
+    return;
+  }
+  state.subject=name;
+  state.used={};
+  state.difficulty=1;
+  document.getElementById('lvlSel').value=1;
+  document.querySelectorAll('.subj-card').forEach(c=>c.classList.toggle('active',c.dataset.subj===name));
+  document.getElementById('subject-section').style.display='none';
+  document.getElementById('quiz-section').style.display='block';
+  document.getElementById('medicalBanner').style.display=(name==="רפואה")?'flex':'none';
+  const meta=SUBJECTS_META.find(s=>s.name===name);
+  document.getElementById('currentSubjectLabel').textContent=`// ${meta?meta.icon:''} ${name}`;
+  updateStats();
   next();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goBack(){
+  document.getElementById('quiz-section').style.display='none';
+  document.getElementById('subject-section').style.display='block';
+  document.getElementById('subject-section').scrollIntoView({behavior:'smooth'});
+}
+
+function confirmMedical(){
+  state.medicalConfirmed=true;
+  document.getElementById('medModal').style.display='none';
+  selectSubject("רפואה");
+}
+function cancelMedical(){
+  document.getElementById('medModal').style.display='none';
 }
 
 function changeLvl(){
   state.difficulty=+document.getElementById("lvlSel").value;
-  state.used.clear(); next();
+  const key=state.subject+'_'+state.difficulty;
+  state.used[key]=new Set();
+  next();
 }
 
 function getPool(){
-  let q=ALL.filter(x=>x.l===state.difficulty&&(state.topic==="הכל"||x.t===state.topic));
-  let avail=q.filter(x=>!state.used.has(x.q));
-  if(!avail.length){state.used.clear();avail=q;}
+  const key=state.subject+'_'+state.difficulty;
+  if(!state.used[key]) state.used[key]=new Set();
+  let pool=ALL.filter(x=>x.l===state.difficulty&&(state.subject==="הכל"||x.t===state.subject));
+  let avail=pool.filter(x=>!state.used[key].has(x.q));
+  if(!avail.length){state.used[key]=new Set();avail=pool;}
   return avail;
 }
 
@@ -689,24 +632,19 @@ function next(){
   document.getElementById("fb").className="feedback";
   document.getElementById("lvlUp").className="level-up";
   document.getElementById("nextBtn").disabled=true;
-  let pool=getPool();
-  if(!pool.length){document.getElementById("qText").textContent="אין שאלות לנושא זה.";return;}
-  let q=pool[Math.floor(Math.random()*pool.length)];
-  state.used.add(q.q); state.current=q;
+  const pool=getPool();
+  if(!pool.length){document.getElementById("qText").textContent="אין שאלות לנושא ורמה זו.";return;}
+  const q=pool[Math.floor(Math.random()*pool.length)];
+  const key=state.subject+'_'+state.difficulty;
+  state.used[key].add(q.q);
+  state.current=q;
   document.getElementById("badgeDiff").textContent=DIFF_LABEL[q.l];
   document.getElementById("badgeDiff").className="badge "+DIFF_CLASS[q.l];
   document.getElementById("qText").textContent=q.q;
   document.getElementById("opts").innerHTML=q.o.map((op,i)=>
     `<button class="opt" onclick="answer(${i})">${op}</button>`
   ).join('');
-  
-  // עדכון סטטיסטיקה במסך
-  document.getElementById("correct").textContent=state.correct;
-  document.getElementById("wrong").textContent=state.wrong;
-  document.getElementById("xpNum").textContent=state.xp;
-  updateXPBar();
-
-  document.getElementById("prog").textContent=`שאלות שנשאלו: ${state.used.size} | נכון: ${state.correct} | שגוי: ${state.wrong}`;
+  updateStats();
 }
 
 function answer(i){
@@ -718,8 +656,8 @@ function answer(i){
   opts[q.a].classList.add("correct");
   const fb=document.getElementById("fb");
   if(i===q.a){
-    state.correct++; state.streak++;
-    let gain=state.difficulty*10+(state.streak>2?5:0);
+    state.correct++;state.streak++;
+    const gain=state.difficulty*10+(state.streak>2?5:0);
     state.xp+=gain;
     fb.className="feedback correct show";
     fb.textContent=`✓ נכון! +${gain} XP`+(state.streak>2?` (רצף ×${state.streak})`:"");
@@ -727,20 +665,14 @@ function answer(i){
   } else {
     opts[i].classList.add("wrong");
     opts[q.a].classList.add("reveal");
-    state.wrong++; state.streak=0;
+    state.wrong++;state.streak=0;
     fb.className="feedback wrong show";
     fb.textContent=`✗ שגוי. התשובה הנכונה: ${q.o[q.a]}`;
   }
-  
-  // --- שמירה לדפדפן ---
-  localStorage.setItem('userXP', state.xp);
-  localStorage.setItem('userCorrect', state.correct);
-  localStorage.setItem('userWrong', state.wrong);
-
-  document.getElementById("correct").textContent=state.correct;
-  document.getElementById("wrong").textContent=state.wrong;
-  document.getElementById("xpNum").textContent=state.xp;
-  updateStreak(); updateXPBar();
+  localStorage.setItem('userXP',state.xp);
+  localStorage.setItem('userCorrect',state.correct);
+  localStorage.setItem('userWrong',state.wrong);
+  updateStats();
   document.getElementById("nextBtn").disabled=false;
 }
 
@@ -752,7 +684,7 @@ function explainQ(){
 }
 
 function checkLevelUp(){
-  const th=[100,250,450,700,1000];
+  const th=[100,250,450,700,1000,1500];
   const newLvl=th.filter(t=>state.xp>=t).length+1;
   if(newLvl>state.lvl){
     state.lvl=newLvl;
@@ -762,7 +694,7 @@ function checkLevelUp(){
 }
 
 function updateXPBar(){
-  const th=[0,100,250,450,700,1000];
+  const th=[0,100,250,450,700,1000,1500];
   const cur=Math.min(state.lvl-1,th.length-2);
   const lo=th[cur],hi=th[cur+1]||state.xp+100;
   const pct=Math.min(100,((state.xp-lo)/(hi-lo))*100);
@@ -771,13 +703,19 @@ function updateXPBar(){
   document.getElementById("xpNext").textContent=`${state.xp} / ${hi} XP`;
 }
 
-function updateStreak(){
-  const b=document.getElementById("streakBadge");
+function updateStats(){
+  document.getElementById("correct").textContent=state.correct;
+  document.getElementById("wrong").textContent=state.wrong;
+  document.getElementById("xpNum").textContent=state.xp;
   document.getElementById("streakNum").textContent=state.streak;
-  b.style.display=state.streak>1?"inline-block":"none";
+  document.getElementById("streakBadge").style.display=state.streak>1?"inline-block":"none";
+  updateXPBar();
+  const key=state.subject+'_'+state.difficulty;
+  const used=state.used[key]?state.used[key].size:0;
+  document.getElementById("prog").textContent=`שאלות שנשאלו: ${used} | נכון: ${state.correct} | שגוי: ${state.wrong}`;
 }
 
-initTopics(); next();
+buildSubjects();
 </script>
 </body>
 </html>
