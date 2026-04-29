@@ -3,233 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מבחן הידע הגדול 🧠✨</title>
+    <title>מדע בכיף – הכל רמה הבאה</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
     <style>
         :root {
-            --primary: #6366f1;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --bg: #0f172a;
-            --card: #1e293b;
-            --text: #f8fafc;
+            --cyan: #00f5ff; --teal: #00d4aa; --blue: #0066ff; --purple: #7b2fff;
+            --red: #ff4466; --green: #00ff88; --yellow: #ffcc00; --bg: #020810;
+            --surface: rgba(0,245,255,0.04); --border: rgba(0,245,255,0.15);
+            --text: #e8f4f8; --muted: #6a8fa8;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Heebo', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+
+        /* ─── BACKGROUND PARTICLES ─── */
+        #particles-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+        /* ─── HERO SECTION ─── */
+        #hero {
+            position: relative; height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center; z-index: 2;
         }
-
-        .container {
-            width: 90%;
-            max-width: 600px;
-            background: var(--card);
-            padding: 2rem;
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            text-align: center;
+        .hero-title {
+            font-family: 'Orbitron', sans-serif; font-size: clamp(3rem, 10vw, 6rem);
+            font-weight: 900; letter-spacing: -2px; margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff 0%, var(--cyan) 50%, var(--blue) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-
-        .header {
-            margin-bottom: 2rem;
+        .cta-btn {
+            padding: 18px 45px; background: linear-gradient(135deg, var(--cyan), var(--blue));
+            border: none; border-radius: 50px; font-family: 'Orbitron'; font-weight: 700;
+            color: #000; cursor: pointer; transition: 0.3s; box-shadow: 0 0 30px rgba(0,245,255,0.4);
         }
+        .cta-btn:hover { transform: scale(1.05); box-shadow: 0 0 50px var(--cyan); }
 
-        .progress-container {
-            background: #334155;
-            height: 12px;
-            border-radius: 10px;
-            margin: 20px 0;
-            overflow: hidden;
-            position: relative;
+        /* ─── QUIZ INTERFACE ─── */
+        #quiz-section {
+            max-width: 800px; margin: 2rem auto; padding: 2rem; display: none;
+            position: relative; z-index: 10;
         }
-
-        #progress-bar {
-            background: linear-gradient(90deg, #6366f1, #a855f7);
-            height: 100%;
-            width: 0%;
-            transition: width 0.5s ease;
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--surface); padding: 15px; border-radius: 15px;
+            border: 1px solid var(--border); backdrop-filter: blur(10px); margin-bottom: 1.5rem;
         }
+        .streak { color: var(--yellow); font-family: 'Orbitron'; font-weight: bold; font-size: 14px; }
 
-        .stats {
-            font-size: 0.9rem;
-            color: #94a3b8;
-            margin-bottom: 10px;
+        .xp-container { margin-bottom: 2rem; }
+        .xp-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+        .xp-track { height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+        .xp-fill { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--purple)); width: 0%; transition: 0.6s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
+
+        .card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 25px;
+            padding: 2.5rem; backdrop-filter: blur(15px); box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
+        .category-tag { font-family: 'Orbitron'; color: var(--cyan); font-size: 11px; letter-spacing: 2px; margin-bottom: 10px; }
+        .question { font-size: 24px; font-weight: 500; margin-bottom: 2rem; line-height: 1.4; }
 
-        .question-box {
-            margin-bottom: 2rem;
+        .options { display: grid; gap: 12px; }
+        .opt {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            padding: 16px; border-radius: 12px; color: var(--text); font-size: 16px;
+            text-align: right; cursor: pointer; transition: 0.2s; position: relative;
         }
-
-        .category-tag {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            background: var(--primary);
-            margin-bottom: 10px;
-        }
-
-        h2 { margin: 10px 0; font-size: 1.5rem; }
-
-        .options {
-            display: grid;
-            gap: 12px;
-        }
-
-        button.option {
-            background: #334155;
-            color: white;
-            border: 2px solid transparent;
-            padding: 15px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: all 0.2s;
-            text-align: right;
-        }
-
-        button.option:hover {
-            background: #475569;
-            transform: translateY(-2px);
-        }
-
-        button.correct { background: var(--success) !important; border-color: #4ade80; }
-        button.wrong { background: var(--danger) !important; border-color: #f87171; }
-
-        .explanation {
-            margin-top: 1.5rem;
-            padding: 15px;
-            background: rgba(99, 102, 241, 0.1);
-            border-radius: 10px;
-            display: none;
-        }
+        .opt:hover:not(:disabled) { border-color: var(--cyan); background: rgba(0,245,255,0.08); transform: translateX(-5px); }
+        .opt.correct { background: rgba(0,255,136,0.2) !important; border-color: var(--green) !important; color: var(--green); }
+        .opt.wrong { background: rgba(255,68,102,0.2) !important; border-color: var(--red) !important; color: var(--red); }
 
         .next-btn {
-            margin-top: 20px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            display: none;
+            width: 100%; margin-top: 2rem; padding: 15px; border-radius: 12px;
+            background: var(--cyan); color: #000; font-family: 'Orbitron';
+            font-weight: 900; border: none; cursor: pointer; display: none;
+            animation: fadeIn 0.3s;
         }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <div id="category" class="category-tag">טוען...</div>
-        <div class="stats">נשארו <span id="remaining">0</span> מתוך <span id="total">0</span> שאלות 🎯</div>
-        <div class="progress-container">
-            <div id="progress-bar"></div>
+    <canvas id="particles-canvas"></canvas>
+
+    <section id="hero">
+        <h1 class="hero-title">מדע בכיף</h1>
+        <p style="color:var(--muted); margin-bottom:2rem; font-size:1.2rem;">KNOWLEDGE NEXT LEVEL</p>
+        <button class="cta-btn" onclick="initQuiz()">התחל תרגול</button>
+    </section>
+
+    <section id="quiz-section">
+        <div class="topbar">
+            <div class="streak" id="streakLabel">🔥 STREAK: 0</div>
+            <div style="font-family:'Orbitron'; font-size:12px; color:var(--muted);">PROGRESS: <span id="percentText" style="color:var(--cyan)">0%</span></div>
         </div>
-    </div>
 
-    <div class="question-box">
-        <h2 id="question-text">טוען שאלה...</h2>
-        <div id="options" class="options"></div>
-    </div>
+        <div class="xp-container">
+            <div class="xp-label"><span>LEVEL 1</span><span id="qCount">0/400 השלמת</span></div>
+            <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+        </div>
 
-    <div id="explanation" class="explanation"></div>
-    <button id="next-btn" class="next-btn" onclick="loadNextQuestion()">לשאלה הבאה ➔</button>
-</div>
+        <div class="card">
+            <div class="category-tag" id="catLabel">CATEGORY</div>
+            <div class="question" id="qText">טוען נתונים מהמערכת...</div>
+            <div class="options" id="opts"></div>
+            <button class="next-btn" id="nextBtn" onclick="renderQuestion()">השאלה הבאה ➔</button>
+        </div>
+    </section>
 
-<script>
-    // מאגר ה-JSON המאוחד (קיצרתי מעט כדי שייכנס כאן, תוכל להוסיף את כל ה-400 באותו פורמט)
-    const questionsDB = [
-        {"l":1,"t":"ביולוגיה","q":"מה הוא ה'תחנת הכוח' של התא? 🧬","o":["גרעין","מיטוכונדריה","ריבוזום","ממברנה"],"a":1,"e":"המיטוכונדריה מייצרת ATP – אנרגיה לתא."},
-        {"l":1,"t":"כימיה","q":"מהו H₂O? 🧪","o":["מלח","מים","סוכר","חמצן"],"a":1,"e":"מים מורכבים משני אטומי מימן ואטום חמצן אחד."},
-        {"l":2,"t":"מתמטיקה","q":"מהו שטח עיגול? 🧮","o":["2πr","πr²","πd","2r"],"a":1,"e":"שטח עיגול מחושב כפאי כפול הרדיוס בריבוע."},
-        {"l":1,"t":"פיזיקה","q":"מהו כוח המשיכה של כדור הארץ (g)? ⚡","o":["5.8 m/s²","9.8 m/s²","12 m/s²","1.6 m/s²"],"a":1,"e":"תאוצת הכובד הממוצעת היא 9.8 מטר לשנייה בריבוע."},
-        {"l":1,"t":"רפואה","q":"מהו האיבר הגדול ביותר בגוף? 🩺","o":["כבד","עור","ריאות","מעי דק"],"a":1,"e":"העור הוא האיבר בעל השטח הגדול ביותר."},
-        {"l":1,"t":"אנגלית","q":"What is the past tense of 'Go'? 🌎","o":["Goed","Went","Gone","Going"],"a":1,"e":"'Went' היא הצורה הלא-רגילה של הפועל בעבר."}
-    ];
+    <script>
+        // ─── נתונים (DATABASE) ───
+        const db = [
+            {t:"ביולוגיה", q:"מה הוא ה'תחנת הכוח' של התא?", o:["גרעין","מיטוכונדריה","ריבוזום","ממברנה"], a:1},
+            {t:"כימיה", q:"מהי הנוסחה הכימית של מים?", o:["H2O","CO2","NaCl","O2"], a:0},
+            {t:"פיזיקה", q:"מהו המרכיב העיקרי בסיבי פחמן (Carbon Fiber)?", o:["פלסטיק","פחמן","ברזל","זכוכית"], a:1},
+            {t:"ביולוגיה", q:"כמה לבבות יש לאדם?", o:["2","1","3","4"], a:1},
+            // תוסיף כאן את כל השאלות שלך באותו מבנה...
+        ];
 
-    let currentQuestionIndex = 0;
-    let answeredIndices = JSON.parse(localStorage.getItem('answeredQuestions')) || [];
+        // ─── סאונדים ───
+        const sfxCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
+        const sfxWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3');
 
-    function init() {
-        if (answeredIndices.length === questionsDB.length) {
-            alert("כל הכבוד! סיימת את כל המאגר! 🏆");
-            answeredIndices = []; // איפוס לצורך הדגמה
+        let answered = JSON.parse(localStorage.getItem('maor_quiz_progress')) || [];
+
+        function initQuiz() {
+            document.getElementById('hero').style.display = 'none';
+            document.getElementById('quiz-section').style.display = 'block';
+            updateStreak();
+            renderQuestion();
         }
-        
-        // מוצא שאלה שטרם נענתה
-        let nextIndex = 0;
-        while (answeredIndices.includes(nextIndex) && answeredIndices.length < questionsDB.length) {
-            nextIndex++;
-        }
-        currentQuestionIndex = nextIndex;
-        displayQuestion();
-        updateStats();
-    }
 
-    function updateStats() {
-        const total = questionsDB.length;
-        const answered = answeredIndices.length;
-        document.getElementById('total').innerText = total;
-        document.getElementById('remaining').innerText = total - answered;
-        document.getElementById('progress-bar').style.width = (answered / total * 100) + "%";
-    }
+        function updateStreak() {
+            const today = new Date().toDateString();
+            const last = localStorage.getItem('maor_last_date');
+            let streak = parseInt(localStorage.getItem('maor_streak')) || 0;
 
-    function displayQuestion() {
-        const q = questionsDB[currentQuestionIndex];
-        document.getElementById('category').innerText = q.t;
-        document.getElementById('question-text').innerText = q.q;
-        const optionsDiv = document.getElementById('options');
-        optionsDiv.innerHTML = '';
-        
-        q.o.forEach((opt, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'option';
-            btn.innerText = opt;
-            btn.onclick = () => checkAnswer(index, btn);
-            optionsDiv.appendChild(btn);
-        });
-
-        document.getElementById('explanation').style.display = 'none';
-        document.getElementById('next-btn').style.display = 'none';
-    }
-
-    function checkAnswer(selectedIndex, btn) {
-        const q = questionsDB[currentQuestionIndex];
-        const allButtons = document.querySelectorAll('.option');
-        
-        allButtons.forEach(b => b.disabled = true);
-
-        if (selectedIndex === q.a) {
-            btn.classList.add('correct');
-            if (!answeredIndices.includes(currentQuestionIndex)) {
-                answeredIndices.push(currentQuestionIndex);
-                localStorage.setItem('answeredQuestions', JSON.stringify(answeredIndices));
+            if (last !== today) {
+                if (last === new Date(Date.now() - 86400000).toDateString()) streak++;
+                else streak = 1;
+                localStorage.setItem('maor_streak', streak);
+                localStorage.setItem('maor_last_date', today);
             }
-        } else {
-            btn.classList.add('wrong');
-            allButtons[q.a].classList.add('correct');
+            document.getElementById('streakLabel').innerText = `🔥 STREAK: ${streak}`;
         }
 
-        const exp = document.getElementById('explanation');
-        exp.innerText = "💡 " + q.e;
-        exp.style.display = 'block';
-        document.getElementById('next-btn').style.display = 'inline-block';
-        updateStats();
-    }
+        function renderQuestion() {
+            let nextIdx = 0;
+            while(answered.includes(nextIdx) && answered.length < db.length) nextIdx++;
 
-    function loadNextQuestion() {
-        init();
-    }
+            if (answered.length >= db.length) {
+                document.getElementById('qText').innerText = "כל הכבוד! סיימת את כל המאגר! 🏆";
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                return;
+            }
 
-    init();
-</script>
+            const q = db[nextIdx];
+            document.getElementById('catLabel').innerText = q.t;
+            document.getElementById('qText').innerText = q.q;
+            document.getElementById('nextBtn').style.display = 'none';
+            
+            const optsBox = document.getElementById('opts');
+            optsBox.innerHTML = '';
+            
+            q.o.forEach((opt, i) => {
+                const b = document.createElement('button');
+                b.className = 'opt';
+                b.innerText = opt;
+                b.onclick = () => checkAns(i, b, nextIdx);
+                optsBox.appendChild(b);
+            });
+            updateUI();
+        }
 
+        function checkAns(idx, btn, qIdx) {
+            const q = db[qIdx];
+            const btns = document.querySelectorAll('.opt');
+            btns.forEach(b => b.disabled = true);
+
+            if (idx === q.a) {
+                btn.classList.add('correct');
+                sfxCorrect.play();
+                confetti({ particleCount: 40, spread: 50, colors: ['#00f5ff', '#00ff88'] });
+                if (!answered.includes(qIdx)) {
+                    answered.push(qIdx);
+                    localStorage.setItem('maor_quiz_progress', JSON.stringify(answered));
+                }
+            } else {
+                btn.classList.add('wrong');
+                btns[q.a].classList.add('correct');
+                sfxWrong.play();
+            }
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
+        function updateUI() {
+            const pct = (answered.length / db.length) * 100;
+            document.getElementById('xpFill').style.width = pct + "%";
+            document.getElementById('percentText').innerText = Math.floor(pct) + "%";
+            document.getElementById('qCount').innerText = `${answered.length}/${db.length} הושלמו`;
+        }
+
+        // ─── PARTICLES CORE ───
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let pts = [];
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.onresize = resize;
+        resize();
+
+        for(let i=0; i<80; i++) pts.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.4});
+
+        function anim() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            pts.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x<0 || p.x>canvas.width) p.vx *= -1;
+                if(p.y<0 || p.y>canvas.height) p.vy *= -1;
+                ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
+                ctx.fillStyle = "rgba(0, 245, 255, 0.3)"; ctx.fill();
+                
+                for(let j=i+1; j<pts.length; j++) {
+                    let p2 = pts[j];
+                    let d = Math.hypot(p.x-p2.x, p.y-p2.y);
+                    if(d < 120) {
+                        ctx.beginPath(); ctx.strokeStyle = `rgba(0, 245, 255, ${1 - d/120})`;
+                        ctx.lineWidth = 0.5; ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(anim);
+        }
+        anim();
+    </script>
 </body>
 </html>
