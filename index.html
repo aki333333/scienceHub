@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מערכת למידה מטורפת - מדע בכיף</title>
+    <title>מדע בכיף - Pro Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Heebo:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -14,60 +14,54 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Heebo', sans-serif; background: var(--bg); color: #fff; overflow-x: hidden; }
 
-        /* Background */
         #bg-canvas { position: fixed; inset: 0; z-index: -1; }
 
-        /* Main Wrapper */
-        .container { max-width: 900px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; }
+        .container { max-width: 850px; margin: 0 auto; padding: 20px; min-height: 100vh; }
 
-        /* Header & Stats */
         header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: var(--card); border-radius: 20px; border: 1px solid var(--border); margin-bottom: 20px; backdrop-filter: blur(10px); }
-        .logo { font-family: 'Orbitron'; font-weight: 900; background: linear-gradient(to right, #fff, var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 24px; }
-        .stat-item { text-align: center; font-family: 'Orbitron'; font-size: 12px; color: var(--cyan); }
-        .stat-val { display: block; font-size: 18px; color: #fff; }
-
-        /* Filter Menu (The Selection Screen) */
-        #menu-screen { text-align: center; animation: fadeIn 0.5s; }
-        .section-title { font-family: 'Orbitron'; letter-spacing: 2px; margin: 30px 0 15px; color: var(--purple); font-size: 14px; }
-        .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
         
-        .filter-btn {
-            background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 15px;
-            color: #fff; cursor: pointer; transition: 0.3s; font-weight: bold; position: relative; overflow: hidden;
+        /* אזהרה רפואית */
+        .medical-warning { 
+            background: rgba(255, 68, 102, 0.1); border: 1px solid var(--red); 
+            padding: 10px; border-radius: 10px; color: var(--red); 
+            font-size: 12px; text-align: center; margin-bottom: 15px; display: none;
+            animation: pulse 2s infinite;
         }
-        .filter-btn:hover, .filter-btn.active { background: rgba(0,245,255,0.1); border-color: var(--cyan); transform: translateY(-3px); box-shadow: 0 0 20px rgba(0,245,255,0.2); }
-        .filter-btn.active::after { content: '✓'; position: absolute; top: 5px; left: 5px; color: var(--cyan); font-size: 12px; }
+        @keyframes pulse { 0% {opacity: 1} 50% {opacity: 0.6} 100% {opacity: 1} }
+
+        /* מסך בחירה */
+        #menu-screen { text-align: center; animation: fadeIn 0.5s; }
+        .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin: 20px 0; }
+        .filter-btn {
+            background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px;
+            color: #fff; cursor: pointer; transition: 0.3s; font-weight: bold;
+        }
+        .filter-btn.active { background: var(--cyan); color: #000; border-color: var(--cyan); box-shadow: 0 0 15px var(--cyan); }
+        .filter-btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
 
         .start-btn {
             width: 100%; padding: 20px; border-radius: 50px; border: none; font-family: 'Orbitron';
             background: linear-gradient(90deg, var(--blue), var(--purple)); color: #fff; font-size: 18px;
-            font-weight: 900; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 30px rgba(123, 47, 255, 0.4);
+            font-weight: 900; cursor: pointer; margin-top: 20px;
         }
-        .start-btn:hover { transform: scale(1.02); filter: brightness(1.2); }
 
-        /* Quiz Screen */
-        #quiz-screen { display: none; animation: fadeIn 0.5s; }
-        .progress-container { height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
-        #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--blue)); transition: 0.5s; }
-
+        /* מסך קוויז */
+        #quiz-screen, #level-up-screen { display: none; animation: fadeIn 0.5s; }
         .card { background: var(--card); border: 1px solid var(--border); border-radius: 25px; padding: 30px; backdrop-filter: blur(15px); }
-        .q-meta { display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 10px; color: var(--cyan); margin-bottom: 15px; }
-        .question-text { font-size: 22px; font-weight: 700; margin-bottom: 25px; line-height: 1.5; }
-
-        .options-grid { display: grid; gap: 12px; }
+        
         .option {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 18px;
-            border-radius: 15px; color: #fff; text-align: right; cursor: pointer; transition: 0.2s; font-size: 16px;
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); 
+            padding: 18px; border-radius: 15px; color: #fff; text-align: right; 
+            margin-bottom: 10px; cursor: pointer; transition: 0.2s;
         }
-        .option:hover:not(:disabled) { background: rgba(255,255,255,0.1); border-color: #fff; }
-        .option.correct { background: rgba(0,255,136,0.2) !important; border-color: var(--green) !important; color: var(--green); }
-        .option.wrong { background: rgba(255,68,102,0.2) !important; border-color: var(--red) !important; color: var(--red); }
+        .option.correct { background: var(--green) !important; color: #000; }
+        .option.wrong { background: var(--red) !important; color: #fff; }
 
-        .controls { margin-top: 25px; display: flex; gap: 10px; }
-        .btn-ui { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: #fff; cursor: pointer; font-family: 'Orbitron'; font-size: 12px; }
-        .btn-ui.next { background: var(--cyan); color: #000; font-weight: 900; display: none; }
+        .progress-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 20px 0; overflow: hidden; }
+        #progress-fill { height: 100%; background: var(--cyan); width: 0%; transition: 0.4s; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -76,192 +70,191 @@
 
 <div class="container">
     <header>
-        <div class="logo">SCIENCE X</div>
-        <div style="display: flex; gap: 20px;">
-            <div class="stat-item">STREAK <span class="stat-val" id="streakVal">0</span></div>
-            <div class="stat-item">XP <span class="stat-val" id="xpVal">0</span></div>
-        </div>
+        <div class="logo">SCIENCE SYSTEM V3</div>
+        <div id="stats" style="font-family: 'Orbitron'; font-size: 14px;">XP: <span id="xpDisplay">0</span> | LVL: <span id="lvlDisplay">1</span></div>
     </header>
 
+    <div id="medical-alert" class="medical-warning">⚠️ אזהרה: המידע בקטגוריית רפואה הוא לימודי בלבד. אין להשתמש בו לייעוץ רפואי או טיפול!</div>
+
     <div id="menu-screen">
-        <h2 style="font-family: 'Orbitron'; margin-bottom: 10px;">MISSION CONTROL</h2>
-        <p style="color: var(--muted); font-size: 14px;">בחר מקצוע ורמת קושי כדי להתחיל</p>
-
-        <div class="section-title">SUBJECTS / מקצועות</div>
+        <h2 style="font-family: 'Orbitron'; margin-bottom: 20px;">SELECT SUBJECT</h2>
         <div class="filter-grid" id="subject-filters">
-            <button class="filter-btn active" onclick="setSubject('all', this)">הכל</button>
-            </div>
-
-        <div class="section-title">LEVEL / רמה</div>
-        <div class="filter-grid">
-            <button class="filter-btn active" onclick="setLevel('all', this)">כל הרמות</button>
-            <button class="filter-btn" onclick="setLevel(1, this)">רמה 1</button>
-            <button class="filter-btn" onclick="setLevel(2, this)">רמה 2</button>
-            <button class="filter-btn" onclick="setLevel(3, this)">רמה 3</button>
+            <button class="filter-btn active" onclick="setSubject('all', this)">כל המקצועות</button>
+        </div>
+        
+        <h2 style="font-family: 'Orbitron'; margin-top: 30px;">CHOOSE LEVEL</h2>
+        <div class="filter-grid" id="level-filters">
+            <button class="filter-btn active" id="btn-lvl-1" onclick="setLevel(1, this)">LEVEL 1</button>
+            <button class="filter-btn" id="btn-lvl-2" onclick="setLevel(2, this)" disabled>LEVEL 2 🔒</button>
+            <button class="filter-btn" id="btn-lvl-3" onclick="setLevel(3, this)" disabled>LEVEL 3 🔒</button>
         </div>
 
-        <button class="start-btn" onclick="startMission()">LAUNCH MISSION ➔</button>
+        <button class="start-btn" onclick="startQuiz()">LAUNCH MISSION</button>
     </div>
 
     <div id="quiz-screen">
-        <div class="progress-container"><div id="progress-bar"></div></div>
+        <div class="progress-bar"><div id="progress-fill"></div></div>
         <div class="card">
-            <div class="q-meta">
-                <span id="display-cat">CATEGORY</span>
-                <span id="display-lvl">LVL: 1</span>
-            </div>
-            <div class="question-text" id="qText">טוען נתונים...</div>
-            <div class="options-grid" id="opts"></div>
-            <div class="controls">
-                <button class="btn-ui" onclick="location.reload()">ביטול משימה</button>
-                <button class="btn-ui next" id="nextBtn" onclick="nextQuestion()">שאלה הבאה ➔</button>
-            </div>
+            <div id="qCategory" style="color: var(--cyan); font-family: 'Orbitron'; font-size: 12px; margin-bottom: 10px;"></div>
+            <h2 id="qText" style="margin-bottom: 25px;">טוען שאלה...</h2>
+            <div id="opts"></div>
+            <button id="nextBtn" class="start-btn" style="display:none; font-size: 14px;" onclick="renderQuestion()">השאלה הבאה ➔</button>
         </div>
+    </div>
+
+    <div id="level-up-screen" class="card" style="text-align: center;">
+        <h1 style="font-family: 'Orbitron'; color: var(--green); font-size: 40px;">LEVEL UP!</h1>
+        <p id="levelUpText" style="margin: 20px 0; font-size: 18px;"></p>
+        <button class="start-btn" onclick="location.reload()">חזרה לתפריט ופתיחת רמה חדשה</button>
     </div>
 </div>
 
 <script>
-    // --- המאגר שלך (JSON) ---
-    // כאן תדביק את כל ה-400 שורות שלך
+    // מאגר שאלות לדוגמה (תחליף ב-JSON המלא שלך)
     const MASTER_DB = [
-        {l:1, t:"ביולוגיה", q:"מהו האיבר הגדול ביותר בגוף האדם?", o:["לב","ריאות","עור","מוח"], a:2},
-        {l:2, t:"כימיה", q:"מהו המספר האטומי של מימן?", o:["1","2","8","12"], a:0},
-        {l:3, t:"פיזיקה", q:"מהי מהירות האור בקירוב?", o:["300,000 קמ\"ש","300,000 קמ\"ש","1,000 קמ\"ש","10,000 קמ\"ש"], a:1},
-        {l:1, t:"חלל", q:"איזה כוכב לכת הוא הקרוב ביותר לשמש?", o:["מאדים","נוגה","חמה","צדק"], a:2}
+        {l:1, t:"רפואה", q:"מהו לחץ דם תקין בממוצע?", o:["120/80","180/100","90/60","150/90"], a:0},
+        {l:1, t:"פיזיקה", q:"מהירות הקול גבוהה יותר במים מאשר באוויר?", o:["נכון","לא נכון"], a:0},
+        {l:2, t:"ביולוגיה", q:"איזה הורמון מווסת את רמת הסוכר בדם?", o:["אדרנלין","אינסולין","טירוקסין","קורטיזול"], a:1},
+        // ... המאגר שלך ממשיך כאן
     ];
 
-    let filteredDB = [];
-    let currentIdx = 0;
-    let selectedSubject = 'all';
-    let selectedLevel = 'all';
-    let score = parseInt(localStorage.getItem('userXP')) || 0;
+    let currentSubject = 'all';
+    let currentLevel = 1;
+    let filteredQuestions = [];
+    let currentIndex = 0;
+    let xp = parseInt(localStorage.getItem('xp')) || 0;
+    let unlockedLevel = parseInt(localStorage.getItem('unlockedLevel')) || 1;
 
-    const sfxCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
-    const sfxWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3');
+    const sndCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
+    const sndWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3');
 
-    // 1. יצירת כפתורי מקצועות אוטומטית
-    function initMenu() {
-        const subjects = [...new Set(MASTER_DB.map(item => item.t))];
-        const grid = document.getElementById('subject-filters');
-        subjects.forEach(sub => {
-            const btn = document.createElement('button');
-            btn.className = 'filter-btn';
-            btn.innerText = sub;
-            btn.onclick = (e) => setSubject(sub, btn);
-            grid.appendChild(btn);
-        });
-        document.getElementById('xpVal').innerText = score;
-        document.getElementById('streakVal').innerText = localStorage.getItem('userStreak') || 0;
-    }
-
-    function setSubject(sub, btn) {
-        document.querySelectorAll('#subject-filters .filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedSubject = sub;
-    }
-
-    function setLevel(lvl, btn) {
-        document.querySelectorAll('#menu-screen .filter-grid:nth-of-type(4) .filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedLevel = lvl;
-    }
-
-    // 2. סינון המאגר והתחלה
-    function startMission() {
-        filteredDB = MASTER_DB.filter(item => {
-            const matchSub = (selectedSubject === 'all' || item.t === selectedSubject);
-            const matchLvl = (selectedLevel === 'all' || item.l == selectedLevel);
-            return matchSub && matchLvl;
-        });
-
-        if(filteredDB.length === 0) {
-            alert("לא נמצאו שאלות בסינון הזה. בחר שוב!");
-            return;
+    function init() {
+        // עדכון UI
+        document.getElementById('xpDisplay').innerText = xp;
+        document.getElementById('lvlDisplay').innerText = unlockedLevel;
+        
+        // פתיחת כפתורי רמות
+        for(let i=1; i<=unlockedLevel; i++) {
+            const btn = document.getElementById(`btn-lvl-${i}`);
+            if(btn) {
+                btn.disabled = false;
+                if(i > 1) btn.innerText = `LEVEL ${i}`;
+            }
         }
 
-        // ערבוב שאלות
-        filteredDB.sort(() => Math.random() - 0.5);
-        
+        // יצירת כפתורי מקצועות
+        const subjects = [...new Set(MASTER_DB.map(i => i.t))];
+        const filterGrid = document.getElementById('subject-filters');
+        subjects.forEach(s => {
+            const b = document.createElement('button');
+            b.className = 'filter-btn';
+            b.innerText = s;
+            b.onclick = () => setSubject(s, b);
+            filterGrid.appendChild(b);
+        });
+    }
+
+    function setSubject(s, btn) {
+        document.querySelectorAll('#subject-filters .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentSubject = s;
+        // הצגת אזהרה אם נבחר רפואה
+        document.getElementById('medical-alert').style.display = (s === 'רפואה' || s === 'all') ? 'block' : 'none';
+    }
+
+    function setLevel(l, btn) {
+        document.querySelectorAll('#level-filters .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentLevel = l;
+    }
+
+    function startQuiz() {
+        filteredQuestions = MASTER_DB.filter(q => 
+            (currentSubject === 'all' || q.t === currentSubject) && q.l === currentLevel
+        ).sort(() => Math.random() - 0.5);
+
+        if(filteredQuestions.length === 0) return alert("אין שאלות ברמה/מקצוע הזה כרגע.");
+
         document.getElementById('menu-screen').style.display = 'none';
         document.getElementById('quiz-screen').style.display = 'block';
         renderQuestion();
     }
 
     function renderQuestion() {
-        const q = filteredDB[currentIdx];
-        document.getElementById('display-cat').innerText = q.t;
-        document.getElementById('display-lvl').innerText = `LVL: ${q.l}`;
+        if(currentIndex >= filteredQuestions.length) {
+            handleLevelComplete();
+            return;
+        }
+
+        const q = filteredQuestions[currentIndex];
+        document.getElementById('qCategory').innerText = q.t.toUpperCase();
         document.getElementById('qText').innerText = q.q;
         document.getElementById('nextBtn').style.display = 'none';
         
-        const optsGrid = document.getElementById('opts');
-        optsGrid.innerHTML = '';
+        const optsDiv = document.getElementById('opts');
+        optsDiv.innerHTML = '';
 
         q.o.forEach((opt, i) => {
-            const btn = document.createElement('button');
-            btn.className = 'option';
-            btn.innerText = opt;
-            btn.onclick = () => checkAnswer(i, btn);
-            optsGrid.appendChild(btn);
+            const b = document.createElement('button');
+            b.className = 'option';
+            b.innerText = opt;
+            b.onclick = () => checkAnswer(i, b, q.a);
+            optsDiv.appendChild(b);
         });
 
-        updateProgress();
+        document.getElementById('progress-fill').style.width = (currentIndex / filteredQuestions.length * 100) + "%";
     }
 
-    function checkAnswer(idx, btn) {
-        const q = filteredDB[currentIdx];
-        const allOpts = document.querySelectorAll('.option');
-        allOpts.forEach(b => b.disabled = true);
+    function checkAnswer(idx, btn, correct) {
+        const all = document.querySelectorAll('.option');
+        all.forEach(b => b.disabled = true);
 
-        if(idx === q.a) {
+        if(idx === correct) {
             btn.classList.add('correct');
-            sfxCorrect.play();
-            confetti({ particleCount: 30, spread: 60, origin: { y: 0.8 }, colors:['#00f5ff', '#7b2fff'] });
-            score += (q.l * 10);
-            localStorage.setItem('userXP', score);
-            document.getElementById('xpVal').innerText = score;
+            sndCorrect.play();
+            confetti({ particleCount: 50, spread: 70, origin: { y: 0.8 } });
+            xp += 10;
+            localStorage.setItem('xp', xp);
+            document.getElementById('xpDisplay').innerText = xp;
         } else {
             btn.classList.add('wrong');
-            allOpts[q.a].classList.add('correct');
-            sfxWrong.play();
+            all[correct].classList.add('correct');
+            sndWrong.play();
         }
         document.getElementById('nextBtn').style.display = 'block';
     }
 
-    function nextQuestion() {
-        currentIdx++;
-        if(currentIdx < filteredDB.length) {
-            renderQuestion();
+    function handleLevelComplete() {
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('level-up-screen').style.display = 'block';
+        
+        if(currentLevel === unlockedLevel && unlockedLevel < 3) {
+            unlockedLevel++;
+            localStorage.setItem('unlockedLevel', unlockedLevel);
+            document.getElementById('levelUpText').innerText = `מדהים! סיימת את רמה ${currentLevel} ופתחת את רמה ${unlockedLevel}!`;
+            confetti({ particleCount: 200, spread: 100 });
         } else {
-            alert("המשימה הושלמה! כל הכבוד.");
-            location.reload();
+            document.getElementById('levelUpText').innerText = `סיימת את כל השאלות בסינון הנוכחי!`;
         }
     }
 
-    function updateProgress() {
-        const pct = (currentIdx / filteredDB.length) * 100;
-        document.getElementById('progress-bar').style.width = pct + "%";
-    }
-
-    // --- Background Animation ---
+    // אנימציית רקע
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     let pts = [];
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.onresize = resize; resize();
-    for(let i=0; i<60; i++) pts.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: 0.2, vy: 0.2});
+    for(let i=0; i<50; i++) pts.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, v:0.5});
     function draw() {
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = "rgba(0, 245, 255, 0.2)";
+        ctx.fillStyle = "rgba(0, 245, 255, 0.1)";
         pts.forEach(p => {
-            p.x += p.vx; p.y += p.vy;
-            if(p.x > canvas.width) p.x = 0; if(p.y > canvas.height) p.y = 0;
-            ctx.beginPath(); ctx.arc(p.x, p.y, 1.5, 0, Math.PI*2); ctx.fill();
+            p.y -= p.v; if(p.y < 0) p.y = canvas.height;
+            ctx.beginPath(); ctx.arc(p.x, p.y, 1, 0, Math.PI*2); ctx.fill();
         });
         requestAnimationFrame(draw);
     }
-    draw();
-    initMenu();
+    draw(); init();
 </script>
 </body>
 </html>
