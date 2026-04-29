@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מדע בכיף - Pro System</title>
+    <title>SCIENCE X - PRO EDITION</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Heebo:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -12,182 +12,174 @@
             --bg: #020810; --card: rgba(255,255,255,0.03); --border: rgba(0,245,255,0.2);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Heebo', sans-serif; background: var(--bg); color: #fff; overflow: hidden; height: 100vh; }
+        body { font-family: 'Heebo', sans-serif; background: var(--bg); color: #fff; overflow-x: hidden; height: 100vh; }
 
-        /* רקע חלקיקים */
         #bg-canvas { position: fixed; inset: 0; z-index: -1; }
+        .container { max-width: 800px; margin: 0 auto; padding: 15px; position: relative; z-index: 10; }
 
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; position: relative; z-index: 10; }
-
+        /* Header & Stats */
         header { 
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 15px 25px; background: var(--card); border-radius: 20px; 
-            border: 1px solid var(--border); margin-bottom: 20px; backdrop-filter: blur(10px); 
+            padding: 15px 20px; background: var(--card); border-radius: 20px; 
+            border: 1px solid var(--border); margin-bottom: 15px; backdrop-filter: blur(10px); 
         }
-        .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--cyan); letter-spacing: 2px; }
-        
-        .medical-warning { 
-            background: rgba(255, 68, 102, 0.1); border: 1px solid var(--red); 
-            padding: 12px; border-radius: 12px; color: var(--red); 
-            font-size: 13px; text-align: center; margin-bottom: 20px; font-weight: bold;
-            animation: flash 2s infinite;
-        }
-        @keyframes flash { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--cyan); text-shadow: 0 0 10px var(--cyan); font-size: 1.2rem; }
+        .streak-badge { display: none; background: linear-gradient(to top, #ff4500, #ff8c00); padding: 5px 12px; border-radius: 20px; font-family: 'Orbitron'; font-size: 12px; font-weight: 900; color: #fff; box-shadow: 0 0 15px #ff4500; animation: bounce 0.5s infinite alternate; }
 
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-3px); } }
+
+        /* Loading Screen Overlay */
+        #loader { 
+            position: fixed; inset: 0; background: var(--bg); z-index: 1000; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        #loader.active { opacity: 1; pointer-events: all; }
+        .spinner { width: 50px; height: 50px; border: 3px solid transparent; border-top-color: var(--cyan); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Screens */
         .screen { display: none; animation: fadeIn 0.4s ease; }
         .screen.active { display: block; }
 
-        /* גריד כפתורים */
-        .subject-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
-        .subject-btn {
-            background: var(--card); border: 1px solid var(--border); 
-            padding: 25px; border-radius: 20px; color: #fff; cursor: pointer; 
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center;
+        /* Question Card & Shake */
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 25px; padding: 25px; backdrop-filter: blur(15px); transition: 0.3s; }
+        .shake { animation: shake 0.4s; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
         }
-        .subject-btn:hover:not(:disabled) { 
-            border-color: var(--cyan); transform: translateY(-5px); 
-            background: rgba(0, 245, 255, 0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-        .subject-btn h3 { font-family: 'Orbitron'; font-size: 18px; margin-bottom: 8px; color: var(--cyan); }
-        .subject-btn span { font-size: 12px; color: #aaa; }
-        .subject-btn:disabled { opacity: 0.2; cursor: not-allowed; filter: grayscale(1); }
 
-        /* Quiz UI */
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 25px; padding: 30px; backdrop-filter: blur(15px); }
+        /* Subject Buttons */
+        .subject-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+        .subject-btn { 
+            background: var(--card); border: 1px solid var(--border); padding: 25px 15px; 
+            border-radius: 20px; color: #fff; cursor: pointer; transition: 0.3s;
+        }
+        .subject-btn:hover:not(:disabled) { border-color: var(--cyan); transform: scale(1.03); background: rgba(0,245,255,0.05); }
+        .subject-btn:disabled { opacity: 0.2; filter: grayscale(1); }
+
+        /* Options */
         .option {
             width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); 
             padding: 18px; border-radius: 15px; color: #fff; text-align: right; 
-            margin-bottom: 12px; cursor: pointer; transition: 0.2s; font-size: 17px;
+            margin-bottom: 10px; cursor: pointer; transition: 0.2s; font-size: 16px;
+            -webkit-tap-highlight-color: transparent; /* מניעת מסגרת כחולה במובייל */
         }
-        .option:hover:not(:disabled) { background: rgba(255,255,255,0.15); border-color: #fff; }
-        .option.correct { background: var(--green) !important; color: #000; font-weight: 700; border-color: var(--green); }
+        .option.correct { background: var(--green) !important; color: #000; border-color: var(--green); font-weight: bold; }
         .option.wrong { background: var(--red) !important; color: #fff; border-color: var(--red); }
+        .option.hint-hidden { opacity: 0.2; pointer-events: none; filter: blur(1px); }
 
-        .progress-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
-        #progress-fill { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--blue)); width: 0%; transition: 0.5s ease-out; }
+        /* UI Elements */
+        .progress-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 15px; overflow: hidden; }
+        #progress-fill { height: 100%; background: var(--cyan); width: 0%; transition: 0.4s; }
+        
+        .hint-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .btn-hint { background: none; border: 1px solid var(--purple); color: var(--purple); padding: 5px 15px; border-radius: 15px; cursor: pointer; font-size: 12px; font-family: 'Orbitron'; transition: 0.3s; }
+        .btn-hint:disabled { opacity: 0.3; border-color: gray; color: gray; }
 
-        .btn-action { 
-            width: 100%; padding: 18px; border-radius: 50px; border: none; 
-            font-family: 'Orbitron'; font-weight: 900; cursor: pointer; margin-top: 20px; 
-            transition: 0.3s;
-        }
-        .btn-next { background: var(--cyan); color: #000; }
-        .btn-next:hover { box-shadow: 0 0 20px var(--cyan); }
+        .btn-next { width: 100%; padding: 18px; border-radius: 50px; border: none; font-family: 'Orbitron'; font-weight: 900; background: var(--cyan); color: #000; cursor: pointer; margin-top: 15px; display: none; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Mobile Adjustments */
+        @media (max-width: 480px) {
+            .logo { font-size: 1rem; }
+            .option { padding: 14px; font-size: 15px; }
+            .card { padding: 20px; }
+        }
     </style>
 </head>
 <body>
 
+<div id="loader"><div class="spinner"></div><p style="margin-top:15px; color:var(--cyan); font-family:'Orbitron';">SYNCING DATA...</p></div>
 <canvas id="bg-canvas"></canvas>
 
 <div class="container">
     <header>
         <div class="logo">SCIENCE X</div>
-        <div style="font-family: 'Orbitron'; font-size: 14px;">
-            XP: <span id="xpDisplay" style="color:var(--cyan)">0</span> | 
-            LVL: <span id="lvlDisplay" style="color:var(--green)">1</span>
-        </div>
+        <div id="streak" class="streak-badge">🔥 <span id="streakCount">0</span> STREAK</div>
+        <div style="font-family: 'Orbitron'; font-size: 13px;">XP: <span id="xpVal" style="color:var(--cyan)">0</span></div>
     </header>
 
     <div id="menu-screen" class="screen active">
-        <div class="medical-warning">⚠️ אזהרה: המידע לימודי בלבד. אין להסתמך עליו לצרכים רפואיים!</div>
-        <h2 style="text-align: center; font-family: 'Orbitron'; margin-bottom: 25px; letter-spacing: 1px;">CHOOSE MISSION</h2>
-        
+        <div style="background:rgba(255,68,102,0.1); border:1px solid var(--red); color:var(--red); padding:10px; border-radius:10px; text-align:center; font-size:12px; margin-bottom:20px; font-weight:bold;">
+            ⚠️ אזהרה: המידע לימודי בלבד. אין להשתמש בו לייעוץ רפואי!
+        </div>
         <div class="subject-grid">
-            <button class="subject-btn" onclick="startQuiz('רפואה')">
-                <h3>MEDICAL</h3>
-                <span>רפואה ומערכות הגוף</span>
-            </button>
-            <button class="subject-btn" onclick="startQuiz('פיזיקה')">
-                <h3>PHYSICS</h3>
-                <span>חוקי טבע וחלל</span>
-            </button>
-            <button class="subject-btn" onclick="startQuiz('כימיה')">
-                <h3>CHEMISTRY</h3>
-                <span>יסודות ותגובות</span>
-            </button>
-            <button id="lvl2-btn" class="subject-btn" onclick="startQuiz('lvl2')">
-                <h3>LEVEL 2</h3>
-                <span id="lvl2-status">🔒 נעול - סיים רמה 1</span>
-            </button>
+            <button class="subject-btn" onclick="prepareQuiz('רפואה')"><h3>MEDICAL</h3><span>רפואה</span></button>
+            <button class="subject-btn" onclick="prepareQuiz('פיזיקה')"><h3>PHYSICS</h3><span>פיזיקה</span></button>
+            <button class="subject-btn" onclick="prepareQuiz('כימיה')"><h3>CHEMISTRY</h3><span>כימיה</span></button>
+            <button id="lvl2-btn" class="subject-btn" onclick="prepareQuiz('lvl2')" disabled><h3>LEVEL 2</h3><span>🔒 סיים רמה 1</span></button>
         </div>
     </div>
 
     <div id="quiz-screen" class="screen">
+        <div class="hint-bar">
+            <span id="qCounter" style="font-size:11px; font-family:'Orbitron'; color:rgba(255,255,255,0.5);">QUESTION 1/10</span>
+            <button id="hintBtn" class="btn-hint" onclick="applyHint()">50/50 HINT (-25 XP)</button>
+        </div>
         <div class="progress-bar"><div id="progress-fill"></div></div>
-        <div class="card">
-            <div id="qLabel" style="font-family: 'Orbitron'; font-size: 11px; color: var(--cyan); margin-bottom: 10px; opacity: 0.8;">MISSION IN PROGRESS</div>
-            <h2 id="qText" style="margin-bottom: 25px; line-height: 1.4;"></h2>
+        <div id="qCard" class="card">
+            <h2 id="qText" style="margin-bottom: 25px; line-height:1.4;"></h2>
             <div id="opts"></div>
-            <button id="nextBtn" class="btn-action btn-next" style="display:none;" onclick="handleNext()">המשך ➔</button>
+            <button id="nextBtn" class="btn-next" onclick="renderQuestion()">המשך למשימה הבאה ➔</button>
         </div>
     </div>
 
-    <div id="finish-screen" class="screen card" style="text-align: center;">
-        <h1 id="finishTitle" style="font-family: 'Orbitron'; color: var(--green); font-size: 40px;">LEVEL UP!</h1>
-        <p id="finishText" style="margin: 20px 0; font-size: 18px; color: #ddd;"></p>
-        <button class="btn-action btn-next" onclick="location.reload()">חזרה לתפריט</button>
+    <div id="finish-screen" class="screen card" style="text-align: center; padding: 40px 20px;">
+        <h1 id="fTitle" style="font-family: 'Orbitron'; color: var(--green); margin-bottom:15px;">MISSION COMPLETE</h1>
+        <p id="fText" style="font-size: 18px; margin-bottom:30px;"></p>
+        <button class="btn-next" style="display:block" onclick="location.reload()">חזרה לתפריט</button>
     </div>
 </div>
 
 <script>
-    // --- מאגר נתונים ---
-    // כאן תכניס את ה-400 שורות שלך
+    // מאגר דוגמה - תדביק כאן את ה-JSON שלך
     const MASTER_DB = [
-        {l:1, t:"רפואה", q:"מהו האיבר הגדול ביותר בגוף?", o:["לב","עור","כבד","ריאות"], a:1},
-        {l:1, t:"פיזיקה", q:"מי גילה את כוח המשיכה?", o:["איינשטיין","ניוטון","טסלה","גלילאו"], a:1},
-        {l:1, t:"כימיה", q:"מהו הסמל הכימי של זהב?", o:["Ag","Fe","Au","Pb"], a:2},
-        {l:2, t:"lvl2", q:"שאלה מתקדמת לרמה 2?", o:["תשובה 1","תשובה 2","תשובה 3","תשובה 4"], a:0}
+        {l:1, t:"רפואה", q:"מהו לחץ דם תקין?", o:["120/80","180/100","90/60","150/90"], a:0},
+        {l:1, t:"פיזיקה", q:"מהי מהירות האור?", o:["300,000 קמ\"ש","300,000 קמ\"ש","1,000 קמ\"ש","100 קמ\"ש"], a:1},
+        {l:2, t:"lvl2", q:"שאלה מתקדמת?", o:["תשובה 1","תשובה 2","תשובה 3","תשובה 4"], a:2}
     ];
 
-    let currentQuestions = [];
-    let qIndex = 0;
-    let xp = parseInt(localStorage.getItem('scix_xp')) || 0;
-    let unlocked = parseInt(localStorage.getItem('scix_lvl')) || 1;
-
-    const sndCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
+    let quizSet = [], qIdx = 0, currentStreak = 0;
+    let xp = parseInt(localStorage.getItem('user_xp')) || 0;
+    let unlocked = parseInt(localStorage.getItem('user_lvl')) || 1;
 
     function init() {
-        document.getElementById('xpDisplay').innerText = xp;
-        document.getElementById('lvlDisplay').innerText = unlocked;
-        
-        if(unlocked >= 2) {
-            const btn2 = document.getElementById('lvl2-btn');
-            btn2.disabled = false;
-            document.getElementById('lvl2-status').innerText = "🔓 פתוח - בהצלחה!";
-        }
+        document.getElementById('xpVal').innerText = xp;
+        if(unlocked >= 2) document.getElementById('lvl2-btn').disabled = false;
+    }
+
+    // אפקט טעינה לפני תחילת קוויז
+    function prepareQuiz(type) {
+        document.getElementById('loader').classList.add('active');
+        setTimeout(() => {
+            startQuiz(type);
+            document.getElementById('loader').classList.remove('active');
+        }, 600); 
     }
 
     function startQuiz(type) {
-        // סינון חכם: אם בחרנו מקצוע, נביא שאלות מקצוע. אם בחרנו רמה, נביא לפי רמה.
-        if(type === 'lvl2') {
-            currentQuestions = MASTER_DB.filter(q => q.l === 2);
-        } else {
-            currentQuestions = MASTER_DB.filter(q => q.t === type && q.l === 1);
-        }
-
-        if(currentQuestions.length === 0) return alert("המשימה עדיין לא מוכנה (אין שאלות).");
-        
-        currentQuestions.sort(() => Math.random() - 0.5); // ערבוב
-        qIndex = 0;
+        quizSet = MASTER_DB.filter(q => (type==='lvl2' ? q.l===2 : (q.t===type && q.l===1))).sort(()=>Math.random()-0.5);
+        if(!quizSet.length) return alert("אין שאלות בקטגוריה זו.");
+        qIdx = 0; currentStreak = 0;
         showScreen('quiz-screen');
         renderQuestion();
     }
 
     function renderQuestion() {
-        if(qIndex >= currentQuestions.length) {
-            handleComplete();
-            return;
-        }
-
-        const q = currentQuestions[qIndex];
+        if(qIdx >= quizSet.length) return showFinish();
+        const q = quizSet[qIdx];
+        document.getElementById('qCard').classList.remove('shake');
         document.getElementById('qText').innerText = q.q;
         document.getElementById('nextBtn').style.display = 'none';
+        document.getElementById('qCounter').innerText = `QUESTION ${qIdx+1}/${quizSet.length}`;
+        document.getElementById('hintBtn').disabled = (xp < 25);
         
         const optsDiv = document.getElementById('opts');
         optsDiv.innerHTML = '';
-
         q.o.forEach((opt, i) => {
             const btn = document.createElement('button');
             btn.className = 'option';
@@ -195,46 +187,61 @@
             btn.onclick = () => check(i, btn, q.a);
             optsDiv.appendChild(btn);
         });
-
-        const progress = (qIndex / currentQuestions.length) * 100;
-        document.getElementById('progress-fill').style.width = progress + "%";
+        document.getElementById('progress-fill').style.width = (qIdx/quizSet.length*100) + "%";
     }
 
     function check(idx, btn, correct) {
-        const buttons = document.querySelectorAll('.option');
-        buttons.forEach(b => b.disabled = true);
+        const all = document.querySelectorAll('.option');
+        all.forEach(b => b.disabled = true); // מניעת לחיצה כפולה
 
         if(idx === correct) {
             btn.classList.add('correct');
-            sndCorrect.play();
-            confetti({ particleCount: 40, spread: 60, origin: { y: 0.8 } });
-            xp += 10;
-            localStorage.setItem('scix_xp', xp);
-            document.getElementById('xpDisplay').innerText = xp;
+            currentStreak++;
+            xp += (10 + currentStreak); // בונוס Streak
+            confetti({ particleCount: 30 + (currentStreak*10), spread: 70, origin: { y: 0.8 } });
+            if(currentStreak >= 3) {
+                document.getElementById('streak').style.display = 'block';
+                document.getElementById('streakCount').innerText = currentStreak;
+            }
         } else {
             btn.classList.add('wrong');
-            buttons[correct].classList.add('correct');
+            all[correct].classList.add('correct');
+            document.getElementById('qCard').classList.add('shake'); // אפקט רעידה
+            currentStreak = 0;
+            document.getElementById('streak').style.display = 'none';
         }
+        
+        saveData();
         document.getElementById('nextBtn').style.display = 'block';
+        qIdx++;
     }
 
-    function handleNext() {
-        qIndex++;
-        renderQuestion();
+    function applyHint() {
+        if(xp < 25) return;
+        const q = quizSet[qIdx];
+        const all = Array.from(document.querySelectorAll('.option'));
+        let count = 0;
+        all.forEach((btn, i) => {
+            if(i !== q.a && count < 2) {
+                btn.classList.add('hint-hidden');
+                count++;
+            }
+        });
+        xp -= 25;
+        saveData();
+        document.getElementById('hintBtn').disabled = true;
     }
 
-    function handleComplete() {
+    function saveData() {
+        localStorage.setItem('user_xp', xp);
+        document.getElementById('xpVal').innerText = xp;
+    }
+
+    function showFinish() {
         showScreen('finish-screen');
-        if(unlocked === 1) {
-            unlocked = 2;
-            localStorage.setItem('scix_lvl', 2);
-            document.getElementById('finishTitle').innerText = "LEVEL UP!";
-            document.getElementById('finishText').innerText = "מדהים! סיימת את השלב ופתחת את LEVEL 2!";
-        } else {
-            document.getElementById('finishTitle').innerText = "MISSION COMPLETE";
-            document.getElementById('finishText').innerText = "כל הכבוד! סיימת את כל השאלות במשימה זו.";
-        }
-        confetti({ particleCount: 150, spread: 100 });
+        if(unlocked === 1) { unlocked = 2; localStorage.setItem('user_lvl', 2); }
+        document.getElementById('fText').innerText = `המשימה הושלמה! צברת ${xp} נקודות XP סה"כ.`;
+        confetti({ particleCount: 200, spread: 100 });
     }
 
     function showScreen(id) {
@@ -242,34 +249,20 @@
         document.getElementById(id).classList.add('active');
     }
 
-    // --- אנימציית חלקיקים (Particles) ---
+    // רקע חלקיקים
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
-    let points = [];
-
+    let pts = [];
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.onresize = resize; resize();
-
-    for(let i=0; i<60; i++) points.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5});
-
+    for(let i=0; i<40; i++) pts.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:0.4, vy:0.4});
     function animate() {
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        points.forEach((p, i) => {
-            p.x += p.vx; p.y += p.vy;
-            if(p.x<0 || p.x>canvas.width) p.vx *= -1;
-            if(p.y<0 || p.y>canvas.height) p.vy *= -1;
-
-            ctx.beginPath(); ctx.arc(p.x, p.y, 1.5, 0, Math.PI*2);
-            ctx.fillStyle = "rgba(0, 245, 255, 0.2)"; ctx.fill();
-
-            for(let j=i+1; j<points.length; j++) {
-                const p2 = points[j];
-                const dist = Math.hypot(p.x-p2.x, p.y-p2.y);
-                if(dist < 120) {
-                    ctx.beginPath(); ctx.strokeStyle = `rgba(0, 245, 255, ${0.15 * (1 - dist/120)})`;
-                    ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
-                }
-            }
+        ctx.fillStyle = "rgba(0, 245, 255, 0.15)";
+        pts.forEach(p => {
+            p.x+=p.vx; p.y+=p.vy;
+            if(p.x<0||p.x>canvas.width) p.vx*=-1; if(p.y<0||p.y>canvas.height) p.vy*=-1;
+            ctx.beginPath(); ctx.arc(p.x, p.y, 1.2, 0, Math.PI*2); ctx.fill();
         });
         requestAnimationFrame(animate);
     }
