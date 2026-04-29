@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCIENCE X - ULTIMATE</title>
+    <title>SCIENCE X - THE ORIGINAL LOGIC</title>
     
-    <script src="questions.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Heebo:wght@400;700&display=swap" rel="stylesheet">
 
@@ -14,64 +13,49 @@
             --cyan: #00f5ff; --blue: #0066ff; --purple: #a020f0; --green: #00ff88; --red: #ff4466;
             --bg: #050a15; --card: rgba(15, 25, 45, 0.7); --border: rgba(0, 245, 255, 0.3);
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Heebo', sans-serif; background: var(--bg); color: #fff; overflow: hidden; height: 100vh; }
 
-        /* רקע אנימטיבי */
         #bg-canvas { position: fixed; inset: 0; z-index: -1; opacity: 0.6; }
-
         .container { max-width: 600px; margin: 0 auto; padding: 20px; height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 10; }
 
-        /* Stats Bar */
         header { 
             display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;
             background: var(--card); border-radius: 15px; border: 1px solid var(--border);
             backdrop-filter: blur(10px); margin-bottom: 20px;
         }
-        .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--cyan); text-shadow: 0 0 10px var(--cyan); font-size: 1.1rem; }
-        .xp-tag { font-family: 'Orbitron'; color: var(--cyan); font-weight: bold; }
+        .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
 
-        /* Screens */
-        .screen { display: none; flex-direction: column; height: 100%; animation: slideIn 0.4s ease-out; }
+        .screen { display: none; flex-direction: column; height: 100%; animation: slideIn 0.3s ease-out; }
         .screen.active { display: flex; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Buttons Style */
         .btn-main {
             background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 15px;
             color: #fff; cursor: pointer; transition: 0.3s; font-weight: bold; font-size: 1.1rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); margin-bottom: 15px;
+            margin-bottom: 12px;
         }
-        .btn-main:hover:not(:disabled) { border-color: var(--cyan); background: rgba(0, 245, 255, 0.1); transform: scale(1.02); }
-        .btn-main:active { transform: scale(0.98); }
+        .btn-main:hover:not(:disabled) { border-color: var(--cyan); background: rgba(0, 245, 255, 0.1); }
         .btn-main:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        /* Quiz Card */
         .card { background: var(--card); border: 1px solid var(--border); padding: 25px; border-radius: 20px; backdrop-filter: blur(15px); }
-        .q-text { font-size: 1.4rem; margin-bottom: 20px; line-height: 1.4; text-align: center; }
-
         .option {
-            width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 12px;
+            width: 100%; padding: 16px; margin-bottom: 10px; border-radius: 12px;
             background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-            color: #fff; text-align: right; cursor: pointer; transition: 0.2s; font-size: 1rem;
+            color: #fff; text-align: right; cursor: pointer; transition: 0.2s;
         }
-        .option:hover { background: rgba(255,255,255,0.1); }
-        .option.correct { background: var(--green) !important; color: #000; font-weight: bold; border-color: var(--green); box-shadow: 0 0 15px var(--green); }
-        .option.wrong { background: var(--red) !important; border-color: var(--red); box-shadow: 0 0 15px var(--red); }
+        .option.correct { background: var(--green) !important; color: #000; font-weight: bold; box-shadow: 0 0 15px var(--green); }
+        .option.wrong { background: var(--red) !important; box-shadow: 0 0 15px var(--red); }
         .option.dim { opacity: 0.2; pointer-events: none; }
 
-        /* UI Elements */
         .progress-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 15px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--blue)); width: 0%; transition: 0.4s; }
+        .progress-fill { height: 100%; background: var(--cyan); width: 0%; transition: 0.4s; }
 
-        .btn-next { width: 100%; padding: 18px; background: var(--cyan); color: #000; border: none; border-radius: 12px; font-weight: 900; font-family: 'Orbitron'; cursor: pointer; margin-top: 10px; display: none; }
-        
-        .streak-badge { display: none; color: #ffae00; font-weight: bold; font-family: 'Orbitron'; animation: pulse 0.6s infinite alternate; }
-        @keyframes pulse { from { opacity: 0.7; } to { opacity: 1; filter: drop-shadow(0 0 5px orange); } }
-
+        .btn-next { width: 100%; padding: 18px; background: var(--cyan); color: #000; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; margin-top: 10px; display: none; }
+        .streak-badge { display: none; color: #ffae00; font-family: 'Orbitron'; animation: pulse 0.6s infinite alternate; }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
         .shake { animation: shake 0.4s; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
     </style>
 </head>
 <body>
@@ -82,82 +66,73 @@
     <header>
         <div class="logo">SCIENCE X</div>
         <div id="streak-ui" class="streak-badge">🔥 <span id="streak-num">0</span> STREAK</div>
-        <div class="xp-tag">XP: <span id="xp-val">0</span></div>
+        <div style="font-family:'Orbitron'; color:var(--cyan)">XP: <span id="xp-val">0</span></div>
     </header>
 
     <div id="screen-menu" class="screen active">
-        <h2 style="text-align: center; margin-bottom: 30px; font-family: 'Orbitron'; letter-spacing: 2px;">SELECT SECTOR</h2>
-        <div style="display: flex; flex-direction: column;">
-            <button class="btn-main" onclick="startQuiz('רפואה')">MEDICAL / רפואה</button>
-            <button class="btn-main" onclick="startQuiz('פיזיקה')">PHYSICS / פיזיקה</button>
-            <button class="btn-main" onclick="startQuiz('כימיה')">CHEMISTRY / כימיה</button>
-            <button id="btn-lvl2" class="btn-main" onclick="startQuiz('lvl2')" disabled>🔒 LEVEL 2 (200 XP)</button>
-        </div>
+        <h2 style="text-align: center; margin-bottom: 25px; font-family: 'Orbitron'; color: var(--cyan);">SELECT MISSION</h2>
+        <button class="btn-main" onclick="loadQuestions('רפואה')">MEDICAL / רפואה</button>
+        <button class="btn-main" onclick="loadQuestions('פיזיקה')">PHYSICS / פיזיקה</button>
+        <button class="btn-main" onclick="loadQuestions('כימיה')">CHEMISTRY / כימיה</button>
+        <button id="btn-lvl2" class="btn-main" onclick="loadQuestions('lvl2')" disabled>🔒 LEVEL 2 (200 XP)</button>
     </div>
 
     <div id="screen-quiz" class="screen">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <button onclick="useHint()" id="hint-btn" style="background:none; border:1px solid var(--purple); color:var(--purple); padding:4px 12px; border-radius:8px; cursor:pointer; font-size:11px; font-family:'Orbitron';">50/50 HINT (-25 XP)</button>
-            <span id="q-info" style="font-size: 12px; opacity: 0.5;">0/0</span>
+            <button onclick="useHint()" id="hint-btn" style="background:none; border:1px solid var(--purple); color:var(--purple); padding:4px 12px; border-radius:8px; cursor:pointer; font-size:11px;">50/50 HINT</button>
+            <span id="q-info" style="font-size: 12px; opacity: 0.5;"></span>
         </div>
         <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
         <div id="q-card" class="card">
-            <div id="q-text" class="q-text"></div>
+            <div id="q-text" style="font-size:1.3rem; margin-bottom:20px; text-align:center;"></div>
             <div id="options-box"></div>
-            <button id="next-btn" class="btn-next" onclick="renderNext()">NEXT MISSION ➔</button>
+            <button id="next-btn" class="btn-next" onclick="renderNext()">NEXT QUESTION ➔</button>
         </div>
     </div>
 
     <div id="screen-finish" class="screen card" style="text-align: center; justify-content: center;">
-        <h1 style="color: var(--green); font-family: 'Orbitron'; font-size: 2.5rem;">COMPLETED</h1>
+        <h1 style="color: var(--green); font-family: 'Orbitron';">MISSION CLEARED</h1>
         <p id="finish-msg" style="margin: 20px 0; font-size: 1.2rem;"></p>
-        <button class="btn-main" style="width:100%" onclick="location.reload()">REBOOT SYSTEM</button>
+        <button class="btn-main" onclick="location.reload()">RESTART</button>
     </div>
 </div>
 
 <script>
-    // מערכת צלילים (Web Audio API)
-    const audio = {
-        click: new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'),
+    // סאונדים
+    const sfx = {
         correct: new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'),
-        wrong: new Audio('https://assets.mixkit.co/active_storage/sfx/951/951-preview.mp3')
+        wrong: new Audio('https://assets.mixkit.co/active_storage/sfx/951/951-preview.mp3'),
+        click: new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3')
     };
-    function playSfx(type) { audio[type].currentTime = 0; audio[type].play().catch(()=>{}); }
+    function play(t) { sfx[t].currentTime = 0; sfx[t].play().catch(()=>{}); }
 
+    let MASTER_DB = [];
     let activeQuestions = [], currentIdx = 0, streak = 0;
     let xp = parseInt(localStorage.getItem('scix_xp')) || 0;
-    let unlocked = parseInt(localStorage.getItem('scix_lvl')) || 1;
 
-    function syncUI() {
-        document.getElementById('xp-val').innerText = xp;
-        if(xp >= 200 || unlocked >= 2) document.getElementById('btn-lvl2').disabled = false;
-        if(streak >= 3) {
-            document.getElementById('streak-ui').style.display = 'block';
-            document.getElementById('streak-num').innerText = streak;
-        } else {
-            document.getElementById('streak-ui').style.display = 'none';
+    // --- לוגיקת ה-Fetch המקורית שביקשת ---
+    async function loadQuestions(type) {
+        play('click');
+        try {
+            const response = await fetch('questions.json'); // קורא לקובץ הג'ייסון שלך
+            MASTER_DB = await response.json();
+            
+            activeQuestions = MASTER_DB.filter(q => (type==='lvl2' ? q.l===2 : (q.t===type && q.l===1)))
+                                       .sort(() => Math.random() - 0.5);
+            
+            if(!activeQuestions.length) return alert("לא נמצאו שאלות.");
+            currentIdx = 0; streak = 0;
+            show('screen-quiz');
+            renderNext();
+        } catch (e) {
+            alert("שגיאה בטעינת קובץ questions.json. וודא שהקובץ נמצא באותה תיקייה.");
         }
-    }
-
-    function startQuiz(type) {
-        if(typeof MASTER_DB === 'undefined') return alert("Error: questions.js not loaded!");
-        playSfx('click');
-        
-        activeQuestions = MASTER_DB.filter(q => (type==='lvl2' ? q.l===2 : (q.t===type && q.l===1)))
-                                   .sort(() => Math.random() - 0.5);
-        
-        if(!activeQuestions.length) return alert("No questions found in this sector.");
-        currentIdx = 0; streak = 0;
-        showScreen('screen-quiz');
-        renderNext();
     }
 
     function renderNext() {
         if(currentIdx >= activeQuestions.length) return finish();
         const q = activeQuestions[currentIdx];
-        const card = document.getElementById('q-card');
-        card.classList.remove('shake');
-        
+        document.getElementById('q-card').classList.remove('shake');
         document.getElementById('q-text').innerText = q.q;
         document.getElementById('q-info').innerText = `${currentIdx + 1} / ${activeQuestions.length}`;
         document.getElementById('next-btn').style.display = 'none';
@@ -183,26 +158,24 @@
             btn.classList.add('correct');
             streak++;
             xp += (10 + streak);
-            playSfx('correct');
-            confetti({ particleCount: 40 + (streak * 5), spread: 60, origin: { y: 0.8 } });
+            play('correct');
+            confetti({ particleCount: 40 + (streak*5), spread: 60, origin: { y: 0.8 } });
         } else {
             btn.classList.add('wrong');
             options[a].classList.add('correct');
             document.getElementById('q-card').classList.add('shake');
             streak = 0;
-            playSfx('wrong');
+            play('wrong');
         }
         
         currentIdx++;
-        localStorage.setItem('scix_xp', xp);
-        syncUI();
+        updateStats();
         document.getElementById('next-btn').style.display = 'block';
     }
 
     function useHint() {
         if(xp < 25) return;
-        playSfx('click');
-        const q = activeQuestions[currentIdx - 1]; // currentIdx כבר קודם ב-check
+        const q = activeQuestions[currentIdx - 1];
         const options = Array.from(document.querySelectorAll('.option'));
         let count = 0;
         options.forEach((opt, i) => {
@@ -211,34 +184,45 @@
                 count++;
             }
         });
-        xp -= 25; syncUI();
+        xp -= 25; updateStats();
         document.getElementById('hint-btn').disabled = true;
     }
 
+    function updateStats() {
+        localStorage.setItem('scix_xp', xp);
+        document.getElementById('xp-val').innerText = xp;
+        if(xp >= 200) document.getElementById('btn-lvl2').disabled = false;
+        if(streak >= 3) {
+            document.getElementById('streak-ui').style.display = 'block';
+            document.getElementById('streak-num').innerText = streak;
+        } else {
+            document.getElementById('streak-ui').style.display = 'none';
+        }
+    }
+
     function finish() {
-        showScreen('screen-finish');
-        if(unlocked === 1 && xp >= 200) { unlocked = 2; localStorage.setItem('scix_lvl', 2); }
-        document.getElementById('finish-msg').innerText = `Sector Cleared. Current XP: ${xp}`;
+        show('screen-finish');
+        document.getElementById('finish-msg').innerText = `צברת ${xp} XP בסך הכל!`;
         confetti({ particleCount: 150, spread: 100 });
     }
 
-    function showScreen(id) {
+    function show(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    // רקע חלקיקים עדין
+    // רקע חלקיקים
     const c = document.getElementById('bg-canvas');
     const ctx = c.getContext('2d');
     function res() { c.width = window.innerWidth; c.height = window.innerHeight; }
     res(); window.onresize = res;
-    let pts = Array(40).fill().map(() => ({x:Math.random()*c.width, y:Math.random()*c.height, v:0.3+Math.random()*0.5}));
+    let pts = Array(40).fill().map(() => ({x:Math.random()*c.width, y:Math.random()*c.height, v:0.4}));
     function draw() {
         ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle = "rgba(0, 245, 255, 0.1)";
         pts.forEach(p => { p.y -= p.v; if(p.y < 0) p.y = c.height; ctx.fillRect(p.x, p.y, 2, 2); });
         requestAnimationFrame(draw);
     }
-    draw(); syncUI();
+    draw(); updateStats();
 </script>
 </body>
 </html>
