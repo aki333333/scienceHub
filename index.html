@@ -3,210 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SCIENCE X | OPEN LEARNING</title>
+    <title>SCIENCE X | BULLETPROOF EDITION</title>
+    
+    <script src="questions.js"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Heebo:wght@300;500;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Heebo:wght@400;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --primary: #00f5ff; --secondary: #7b2fff; --success: #00ff88; --danger: #ff4466;
-            --bg-dark: #020610; --glass: rgba(15, 25, 45, 0.85); --border: rgba(0, 245, 255, 0.25);
+            --cyan: #00f5ff; --green: #00ff88; --red: #ff4466; --bg: #020610; 
+            --glass: rgba(15, 25, 45, 0.85); --border: rgba(0, 245, 255, 0.3);
         }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: #fff; font-family: 'Heebo', sans-serif; height: 100vh; overflow: hidden; }
+        #bg-canvas { position: fixed; inset: 0; z-index: -1; }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Heebo', sans-serif; }
-        body { background: var(--bg-dark); color: #fff; height: 100vh; overflow: hidden; display: flex; justify-content: center; }
-        #canvas-bg { position: fixed; inset: 0; z-index: -1; }
+        .container { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px; height: 100vh; display: flex; flex-direction: column; }
 
-        .app-container { width: 100%; max-width: 500px; height: 100vh; display: flex; flex-direction: column; padding: 20px; }
-
-        /* Top Bar */
-        .top-bar {
-            display: flex; justify-content: space-between; align-items: center; 
-            background: var(--glass); padding: 15px 20px; border-radius: 20px; 
-            border: 1px solid var(--border); margin-bottom: 20px; backdrop-filter: blur(15px);
+        header { 
+            display: flex; justify-content: space-between; align-items: center; padding: 15px;
+            background: var(--glass); border-radius: 15px; border: 1px solid var(--border);
+            backdrop-filter: blur(10px); margin-bottom: 20px;
         }
-        .brand { font-family: 'Orbitron'; font-weight: 900; color: var(--primary); letter-spacing: 2px; }
+        .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
 
-        .screen { display: none; flex-direction: column; height: 100%; animation: fadeIn 0.4s ease; }
+        .screen { display: none; flex-direction: column; height: 100%; animation: fadeIn 0.3s ease; }
         .screen.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Menu */
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; overflow-y: auto; padding-bottom: 20px; }
+        /* תפריט */
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .btn-sector {
-            background: var(--glass); border: 1px solid var(--border); padding: 20px 10px; border-radius: 15px;
-            color: #fff; font-size: 0.95rem; font-weight: 800; cursor: pointer; transition: 0.2s;
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            background: var(--glass); border: 1px solid var(--border); padding: 20px; border-radius: 15px;
+            color: #fff; font-weight: 800; cursor: pointer; transition: 0.2s; text-align: center;
         }
-        .btn-sector:hover { border-color: var(--primary); background: rgba(0, 245, 255, 0.1); transform: scale(1.03); }
-        .btn-sector span { font-size: 0.7rem; opacity: 0.6; font-family: 'Orbitron'; }
+        .btn-sector:hover:not(:disabled) { border-color: var(--cyan); background: rgba(0,245,255,0.1); transform: translateY(-3px); }
+        .btn-sector:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-sector span { display: block; font-size: 0.7rem; font-family: 'Orbitron'; opacity: 0.5; margin-top: 5px; }
 
-        /* Quiz Card */
-        .q-card { background: var(--glass); border: 1px solid var(--border); border-radius: 25px; padding: 25px; backdrop-filter: blur(20px); }
-        .q-text { font-size: 1.3rem; font-weight: 800; margin-bottom: 20px; text-align: center; }
-        
-        .opt-btn {
-            width: 100%; padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.03); 
-            border: 1px solid rgba(255,255,255,0.1); color: #fff; text-align: right; 
-            margin-bottom: 8px; cursor: pointer; transition: 0.2s;
+        /* שגיאת מערכת */
+        #sys-error {
+            display: none; background: rgba(255, 68, 102, 0.1); border: 1px solid var(--red);
+            padding: 20px; border-radius: 15px; text-align: center; margin-top: 20px;
         }
-        .opt-btn.correct { background: var(--success) !important; color: #000; font-weight: 800; border-color: var(--success); }
-        .opt-btn.wrong { background: var(--danger) !important; color: #fff; border-color: var(--danger); }
 
-        /* Explanation Box */
-        .explanation-box {
-            margin-top: 15px; padding: 15px; background: rgba(0, 245, 255, 0.05);
-            border-right: 4px solid var(--primary); border-radius: 8px; font-size: 0.95rem;
-            display: none; animation: slideIn 0.3s ease;
-        }
-        @keyframes slideIn { from { opacity: 0; height: 0; } to { opacity: 1; height: auto; } }
+        /* משחק */
+        .card { background: var(--glass); border: 1px solid var(--border); padding: 25px; border-radius: 20px; backdrop-filter: blur(15px); }
+        .q-text { font-size: 1.3rem; font-weight: 800; margin-bottom: 25px; text-align: center; line-height: 1.3; }
 
-        .next-trigger { 
-            width: 100%; padding: 18px; background: var(--primary); color: #000; 
-            border: none; border-radius: 12px; font-family: 'Orbitron'; font-weight: 900; 
-            margin-top: 15px; cursor: pointer; display: none; 
+        .option {
+            width: 100%; padding: 16px; margin-bottom: 10px; border-radius: 12px;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            color: #fff; text-align: right; cursor: pointer; transition: 0.2s; font-size: 1.1rem;
         }
+        .option.correct { background: var(--green) !important; color: #000; font-weight: bold; box-shadow: 0 0 15px var(--green); border-color: var(--green); }
+        .option.wrong { background: var(--red) !important; box-shadow: 0 0 15px var(--red); border-color: var(--red); }
 
         .progress-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 15px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.4s; }
+        .progress-fill { height: 100%; background: var(--cyan); width: 0%; transition: 0.4s; }
+
+        .btn-next { width: 100%; padding: 18px; background: var(--cyan); color: #000; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; margin-top: 10px; display: none; font-family: 'Orbitron'; }
+        
+        .shake { animation: shake 0.4s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
     </style>
 </head>
 <body>
 
-<canvas id="canvas-bg"></canvas>
+<canvas id="bg-canvas"></canvas>
 
-<div class="app-container">
-    <header class="top-bar">
-        <div class="brand">SCIENCE X</div>
-        <div style="font-family:'Orbitron'; font-size:0.8rem">XP: <span id="xp-count" style="color:var(--primary)">0</span></div>
+<div class="container">
+    <header>
+        <div class="logo">SCIENCE X</div>
+        <div style="font-family:'Orbitron'; color:var(--cyan)">XP: <span id="xp-val">0</span></div>
     </header>
 
-    <main id="menu-scr" class="screen active">
-        <h2 style="text-align: center; margin-bottom: 20px; font-family:'Orbitron'; color:var(--primary)">SELECT SECTOR</h2>
-        <div class="menu-grid">
-            <button class="btn-sector" onclick="initMission('רפואה')">רפואה <span>MEDICAL</span></button>
-            <button class="btn-sector" onclick="initMission('פיזיקה')">פיזיקה <span>PHYSICS</span></button>
-            <button class="btn-sector" onclick="initMission('כימיה')">כימיה <span>CHEMISTRY</span></button>
-            <button class="btn-sector" onclick="initMission('אנגלית')">אנגלית <span>ENGLISH</span></button>
-            <button class="btn-sector" onclick="initMission('ביולוגיה')">ביולוגיה <span>BIOLOGY</span></button>
-            <button class="btn-sector" onclick="initMission('מתמטיקה')">מתמטיקה <span>MATH</span></button>
-            <button class="btn-sector" onclick="initMission('מתמטיקה מתקדמת')">מתמטיקה+ <span>ADVANCED</span></button>
+    <div id="scr-menu" class="screen active">
+        <h2 style="text-align:center; margin-bottom:20px; font-family:'Orbitron';">SELECT SECTOR</h2>
+        
+        <div id="sys-error">
+            <h3 style="color:var(--red); margin-bottom:10px;">⚠️ שגיאת מסד נתונים</h3>
+            <p style="font-size:0.9rem;">המערכת לא מצליחה לטעון את השאלות מקובץ ה-<b>questions.js</b>.</p>
+            <p style="font-size:0.8rem; margin-top:10px; opacity:0.8;">וודא שהקובץ באותה תיקייה ושכתוב בתחילתו:<br><code>var MASTER_DB = [ ... ];</code></p>
         </div>
-    </main>
 
-    <main id="quiz-scr" class="screen">
-        <div class="progress-bar"><div id="main-bar" class="progress-fill"></div></div>
-        <div id="quiz-card" class="q-card">
+        <div class="menu-grid" id="menu-buttons">
+            <button class="btn-sector" onclick="start('רפואה')">רפואה<span>MEDICAL</span></button>
+            <button class="btn-sector" onclick="start('פיזיקה')">פיזיקה<span>PHYSICS</span></button>
+            <button class="btn-sector" onclick="start('כימיה')">כימיה<span>CHEMISTRY</span></button>
+            <button class="btn-sector" onclick="start('אנגלית')">אנגלית<span>ENGLISH</span></button>
+            <button class="btn-sector" onclick="start('ביולוגיה')">ביולוגיה<span>BIOLOGY</span></button>
+            <button class="btn-sector" onclick="start('מתמטיקה')">מתמטיקה<span>MATH</span></button>
+            <button class="btn-sector" onclick="start('מתמטיקה מתקדמת')">מתמטיקה+<span>ADVANCED</span></button>
+        </div>
+    </div>
+
+    <div id="scr-quiz" class="screen">
+        <div class="progress-bar"><div id="bar" class="progress-fill"></div></div>
+        <div id="q-card" class="card">
             <div id="q-display" class="q-text"></div>
-            <div id="options-grid"></div>
-            
-            <div id="exp-box" class="explanation-box">
-                <strong style="color:var(--primary)">הסבר:</strong> <span id="exp-text"></span>
-            </div>
-
-            <button id="btn-continue" class="next-trigger" onclick="renderNext()">המשך למשימה הבאה ➔</button>
+            <div id="options-box"></div>
+            <button id="next-btn" class="btn-next" onclick="render()">המשך ➔</button>
         </div>
-    </main>
+    </div>
 
-    <main id="end-scr" class="screen" style="text-align: center; justify-content: center;">
-        <h1 style="font-family:'Orbitron'; color:var(--success); font-size:2rem">COMPLETED</h1>
-        <p id="summary-text" style="margin:20px 0"></p>
-        <button class="btn-sector" style="width:100%" onclick="location.reload()">חזרה לתפריט</button>
-    </main>
+    <div id="scr-end" class="screen card" style="text-align:center; justify-content:center;">
+        <h1 style="color:var(--green); font-family:'Orbitron'; font-size:2rem;">CLEARED</h1>
+        <p id="res-msg" style="margin:20px 0; font-size:1.2rem;"></p>
+        <button class="btn-sector" style="width:100%" onclick="location.reload()">חזרה למערכת</button>
+    </div>
 </div>
 
 <script>
-    const SFX = {
+    // Audio Engine
+    const sfx = {
         correct: new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'),
         wrong: new Audio('https://assets.mixkit.co/active_storage/sfx/951/951-preview.mp3')
     };
 
-    let DB = [], missionSet = [], currentPos = 0, xp = parseInt(localStorage.getItem('scix_xp')) || 0;
+    let missionSet = [], cur = 0, xp = parseInt(localStorage.getItem('scix_xp')) || 0;
 
-    async function initMission(cat) {
-        try {
-            const res = await fetch('questions.json');
-            DB = await res.json();
-            missionSet = DB.filter(q => q.t === cat).sort(() => Math.random() - 0.5);
-            if(!missionSet.length) return alert("אין שאלות בקטגוריה זו.");
-            currentPos = 0;
-            switchScreen('quiz-scr');
-            renderNext();
-        } catch (e) { alert("שגיאה בטעינת questions.json"); }
+    // פונקציה שרצה מיד כשהדף עולה כדי לבדוק תקינות
+    window.onload = () => {
+        document.getElementById('xp-val').innerText = xp;
+        if (typeof MASTER_DB === 'undefined') {
+            // אם הקובץ לא נטען, נציג שגיאה ויזואלית וננעל את הכפתורים
+            document.getElementById('sys-error').style.display = 'block';
+            document.querySelectorAll('.btn-sector').forEach(btn => btn.disabled = true);
+        }
+    };
+
+    function start(cat) {
+        // סינון וערבוב בטוח
+        missionSet = MASTER_DB.filter(q => q.t === cat).sort(() => Math.random() - 0.5);
+        if(!missionSet.length) {
+            alert("אין שאלות בקטגוריה: " + cat);
+            return;
+        }
+        cur = 0;
+        show('scr-quiz');
+        render();
     }
 
-    function renderNext() {
-        if(currentPos >= missionSet.length) return finish();
-        const q = missionSet[currentPos];
+    function render() {
+        if(cur >= missionSet.length) return finish();
+        const q = missionSet[cur];
+        const card = document.getElementById('q-card');
+        card.classList.remove('shake');
         
         document.getElementById('q-display').innerText = q.q;
-        document.getElementById('exp-box').style.display = 'none';
-        document.getElementById('btn-continue').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
         
-        const grid = document.getElementById('options-grid');
-        grid.innerHTML = '';
+        const box = document.getElementById('options-box');
+        box.innerHTML = '';
         q.o.forEach((txt, i) => {
             const b = document.createElement('button');
-            b.className = 'opt-btn';
+            b.className = 'option';
             b.innerText = txt;
-            b.onclick = () => checkAnswer(i, b, q.a, q.e);
-            grid.appendChild(b);
+            b.onclick = () => check(i, b, q.a);
+            box.appendChild(b);
         });
-        document.getElementById('main-bar').style.width = (currentPos / missionSet.length * 100) + "%";
-        document.getElementById('xp-count').innerText = xp;
+        document.getElementById('bar').style.width = (cur / missionSet.length * 100) + "%";
     }
 
-    function checkAnswer(picked, btn, target, explanation) {
-        const btns = document.querySelectorAll('.opt-btn');
-        btns.forEach(b => b.disabled = true);
+    function check(idx, btn, ans) {
+        const btns = document.querySelectorAll('.option');
+        btns.forEach(b => b.disabled = true); // נעילת כפתורים כפולה למניעת באגים
 
-        if(picked === target) {
+        if(idx === ans) {
             btn.classList.add('correct');
-            xp += 20;
-            SFX.correct.play().catch(()=>{});
-            confetti({ particleCount: 40, spread: 60 });
+            xp += 15;
+            sfx.correct.play().catch(()=>{});
+            confetti({ particleCount: 50, spread: 60 });
         } else {
             btn.classList.add('wrong');
-            btns[target].classList.add('correct');
-            SFX.wrong.play().catch(()=>{});
+            btns[ans].classList.add('correct');
+            document.getElementById('q-card').classList.add('shake');
+            sfx.wrong.play().catch(()=>{});
         }
-
-        // הצגת הסבר
-        if(explanation) {
-            document.getElementById('exp-text').innerText = explanation;
-            document.getElementById('exp-box').style.display = 'block';
-        }
-
-        currentPos++;
+        
+        cur++;
         localStorage.setItem('scix_xp', xp);
-        document.getElementById('btn-continue').style.display = 'block';
+        document.getElementById('xp-val').innerText = xp;
+        document.getElementById('next-btn').style.display = 'block';
     }
 
     function finish() {
-        switchScreen('end-scr');
-        document.getElementById('summary-text').innerText = `סיימת את המשימה בהצלחה! צברת XP כולל של: ${xp}`;
+        show('scr-end');
+        document.getElementById('res-msg').innerText = `צברת ${xp} XP בסך הכל!`;
         confetti({ particleCount: 150, spread: 100 });
     }
 
-    function switchScreen(id) {
+    function show(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    // BG Animation
-    const c = document.getElementById('canvas-bg');
-    const ctx = c.getContext('2d');
-    function resize() { c.width = window.innerWidth; c.height = window.innerHeight; }
-    resize(); window.onresize = resize;
-    let dots = Array(30).fill().map(() => ({x:Math.random()*c.width, y:Math.random()*c.height, s:0.4}));
-    function anim() {
-        ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle = "rgba(0, 245, 255, 0.1)";
-        dots.forEach(d => { d.y -= d.s; if(d.y < 0) d.y = c.height; ctx.fillRect(d.x, d.y, 2, 2); });
-        requestAnimationFrame(anim);
+    // אנימציית רקע
+    const cvs = document.getElementById('bg-canvas');
+    const ctx = cvs.getContext('2d');
+    function res() { cvs.width = window.innerWidth; cvs.height = window.innerHeight; }
+    res(); window.onresize = res;
+    let pts = Array(35).fill().map(() => ({x:Math.random()*cvs.width, y:Math.random()*cvs.height, s:0.5}));
+    function draw() {
+        ctx.clearRect(0,0,cvs.width,cvs.height); ctx.fillStyle = "rgba(0,245,255,0.1)";
+        pts.forEach(p => { p.y -= p.s; if(p.y < 0) p.y = cvs.height; ctx.fillRect(p.x, p.y, 2, 2); });
+        requestAnimationFrame(draw);
     }
-    anim();
-    document.getElementById('xp-count').innerText = xp;
+    draw();
 </script>
 </body>
 </html>
