@@ -3,239 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מדע בכיף – הכל רמה הבאה</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>מערכת למידה מטורפת - מדע בכיף</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Heebo:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
     <style>
         :root {
-            --cyan: #00f5ff; --teal: #00d4aa; --blue: #0066ff; --purple: #7b2fff;
-            --red: #ff4466; --green: #00ff88; --yellow: #ffcc00; --bg: #020810;
-            --surface: rgba(0,245,255,0.04); --border: rgba(0,245,255,0.15);
-            --text: #e8f4f8; --muted: #6a8fa8;
+            --cyan: #00f5ff; --blue: #0066ff; --purple: #7b2fff; --green: #00ff88; --red: #ff4466;
+            --bg: #020810; --card: rgba(255,255,255,0.03); --border: rgba(0,245,255,0.2);
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Heebo', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+        body { font-family: 'Heebo', sans-serif; background: var(--bg); color: #fff; overflow-x: hidden; }
 
-        /* ─── BACKGROUND PARTICLES ─── */
-        #particles-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        /* Background */
+        #bg-canvas { position: fixed; inset: 0; z-index: -1; }
 
-        /* ─── HERO SECTION ─── */
-        #hero {
-            position: relative; height: 100vh; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; text-align: center; z-index: 2;
-        }
-        .hero-title {
-            font-family: 'Orbitron', sans-serif; font-size: clamp(3rem, 10vw, 6rem);
-            font-weight: 900; letter-spacing: -2px; margin-bottom: 1rem;
-            background: linear-gradient(135deg, #fff 0%, var(--cyan) 50%, var(--blue) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .cta-btn {
-            padding: 18px 45px; background: linear-gradient(135deg, var(--cyan), var(--blue));
-            border: none; border-radius: 50px; font-family: 'Orbitron'; font-weight: 700;
-            color: #000; cursor: pointer; transition: 0.3s; box-shadow: 0 0 30px rgba(0,245,255,0.4);
-        }
-        .cta-btn:hover { transform: scale(1.05); box-shadow: 0 0 50px var(--cyan); }
+        /* Main Wrapper */
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; }
 
-        /* ─── QUIZ INTERFACE ─── */
-        #quiz-section {
-            max-width: 800px; margin: 2rem auto; padding: 2rem; display: none;
-            position: relative; z-index: 10;
-        }
-        .topbar {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--surface); padding: 15px; border-radius: 15px;
-            border: 1px solid var(--border); backdrop-filter: blur(10px); margin-bottom: 1.5rem;
-        }
-        .streak { color: var(--yellow); font-family: 'Orbitron'; font-weight: bold; font-size: 14px; }
+        /* Header & Stats */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: var(--card); border-radius: 20px; border: 1px solid var(--border); margin-bottom: 20px; backdrop-filter: blur(10px); }
+        .logo { font-family: 'Orbitron'; font-weight: 900; background: linear-gradient(to right, #fff, var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 24px; }
+        .stat-item { text-align: center; font-family: 'Orbitron'; font-size: 12px; color: var(--cyan); }
+        .stat-val { display: block; font-size: 18px; color: #fff; }
 
-        .xp-container { margin-bottom: 2rem; }
-        .xp-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
-        .xp-track { height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
-        .xp-fill { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--purple)); width: 0%; transition: 0.6s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
-
-        .card {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 25px;
-            padding: 2.5rem; backdrop-filter: blur(15px); box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        /* Filter Menu (The Selection Screen) */
+        #menu-screen { text-align: center; animation: fadeIn 0.5s; }
+        .section-title { font-family: 'Orbitron'; letter-spacing: 2px; margin: 30px 0 15px; color: var(--purple); font-size: 14px; }
+        .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        
+        .filter-btn {
+            background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 15px;
+            color: #fff; cursor: pointer; transition: 0.3s; font-weight: bold; position: relative; overflow: hidden;
         }
-        .category-tag { font-family: 'Orbitron'; color: var(--cyan); font-size: 11px; letter-spacing: 2px; margin-bottom: 10px; }
-        .question { font-size: 24px; font-weight: 500; margin-bottom: 2rem; line-height: 1.4; }
+        .filter-btn:hover, .filter-btn.active { background: rgba(0,245,255,0.1); border-color: var(--cyan); transform: translateY(-3px); box-shadow: 0 0 20px rgba(0,245,255,0.2); }
+        .filter-btn.active::after { content: '✓'; position: absolute; top: 5px; left: 5px; color: var(--cyan); font-size: 12px; }
 
-        .options { display: grid; gap: 12px; }
-        .opt {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-            padding: 16px; border-radius: 12px; color: var(--text); font-size: 16px;
-            text-align: right; cursor: pointer; transition: 0.2s; position: relative;
+        .start-btn {
+            width: 100%; padding: 20px; border-radius: 50px; border: none; font-family: 'Orbitron';
+            background: linear-gradient(90deg, var(--blue), var(--purple)); color: #fff; font-size: 18px;
+            font-weight: 900; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 30px rgba(123, 47, 255, 0.4);
         }
-        .opt:hover:not(:disabled) { border-color: var(--cyan); background: rgba(0,245,255,0.08); transform: translateX(-5px); }
-        .opt.correct { background: rgba(0,255,136,0.2) !important; border-color: var(--green) !important; color: var(--green); }
-        .opt.wrong { background: rgba(255,68,102,0.2) !important; border-color: var(--red) !important; color: var(--red); }
+        .start-btn:hover { transform: scale(1.02); filter: brightness(1.2); }
 
-        .next-btn {
-            width: 100%; margin-top: 2rem; padding: 15px; border-radius: 12px;
-            background: var(--cyan); color: #000; font-family: 'Orbitron';
-            font-weight: 900; border: none; cursor: pointer; display: none;
-            animation: fadeIn 0.3s;
+        /* Quiz Screen */
+        #quiz-screen { display: none; animation: fadeIn 0.5s; }
+        .progress-container { height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--blue)); transition: 0.5s; }
+
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 25px; padding: 30px; backdrop-filter: blur(15px); }
+        .q-meta { display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 10px; color: var(--cyan); margin-bottom: 15px; }
+        .question-text { font-size: 22px; font-weight: 700; margin-bottom: 25px; line-height: 1.5; }
+
+        .options-grid { display: grid; gap: 12px; }
+        .option {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 18px;
+            border-radius: 15px; color: #fff; text-align: right; cursor: pointer; transition: 0.2s; font-size: 16px;
         }
+        .option:hover:not(:disabled) { background: rgba(255,255,255,0.1); border-color: #fff; }
+        .option.correct { background: rgba(0,255,136,0.2) !important; border-color: var(--green) !important; color: var(--green); }
+        .option.wrong { background: rgba(255,68,102,0.2) !important; border-color: var(--red) !important; color: var(--red); }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .controls { margin-top: 25px; display: flex; gap: 10px; }
+        .btn-ui { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: #fff; cursor: pointer; font-family: 'Orbitron'; font-size: 12px; }
+        .btn-ui.next { background: var(--cyan); color: #000; font-weight: 900; display: none; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <canvas id="particles-canvas"></canvas>
+<canvas id="bg-canvas"></canvas>
 
-    <section id="hero">
-        <h1 class="hero-title">מדע בכיף</h1>
-        <p style="color:var(--muted); margin-bottom:2rem; font-size:1.2rem;">KNOWLEDGE NEXT LEVEL</p>
-        <button class="cta-btn" onclick="initQuiz()">התחל תרגול</button>
-    </section>
+<div class="container">
+    <header>
+        <div class="logo">SCIENCE X</div>
+        <div style="display: flex; gap: 20px;">
+            <div class="stat-item">STREAK <span class="stat-val" id="streakVal">0</span></div>
+            <div class="stat-item">XP <span class="stat-val" id="xpVal">0</span></div>
+        </div>
+    </header>
 
-    <section id="quiz-section">
-        <div class="topbar">
-            <div class="streak" id="streakLabel">🔥 STREAK: 0</div>
-            <div style="font-family:'Orbitron'; font-size:12px; color:var(--muted);">PROGRESS: <span id="percentText" style="color:var(--cyan)">0%</span></div>
+    <div id="menu-screen">
+        <h2 style="font-family: 'Orbitron'; margin-bottom: 10px;">MISSION CONTROL</h2>
+        <p style="color: var(--muted); font-size: 14px;">בחר מקצוע ורמת קושי כדי להתחיל</p>
+
+        <div class="section-title">SUBJECTS / מקצועות</div>
+        <div class="filter-grid" id="subject-filters">
+            <button class="filter-btn active" onclick="setSubject('all', this)">הכל</button>
+            </div>
+
+        <div class="section-title">LEVEL / רמה</div>
+        <div class="filter-grid">
+            <button class="filter-btn active" onclick="setLevel('all', this)">כל הרמות</button>
+            <button class="filter-btn" onclick="setLevel(1, this)">רמה 1</button>
+            <button class="filter-btn" onclick="setLevel(2, this)">רמה 2</button>
+            <button class="filter-btn" onclick="setLevel(3, this)">רמה 3</button>
         </div>
 
-        <div class="xp-container">
-            <div class="xp-label"><span>LEVEL 1</span><span id="qCount">0/400 השלמת</span></div>
-            <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
-        </div>
+        <button class="start-btn" onclick="startMission()">LAUNCH MISSION ➔</button>
+    </div>
 
+    <div id="quiz-screen">
+        <div class="progress-container"><div id="progress-bar"></div></div>
         <div class="card">
-            <div class="category-tag" id="catLabel">CATEGORY</div>
-            <div class="question" id="qText">טוען נתונים מהמערכת...</div>
-            <div class="options" id="opts"></div>
-            <button class="next-btn" id="nextBtn" onclick="renderQuestion()">השאלה הבאה ➔</button>
+            <div class="q-meta">
+                <span id="display-cat">CATEGORY</span>
+                <span id="display-lvl">LVL: 1</span>
+            </div>
+            <div class="question-text" id="qText">טוען נתונים...</div>
+            <div class="options-grid" id="opts"></div>
+            <div class="controls">
+                <button class="btn-ui" onclick="location.reload()">ביטול משימה</button>
+                <button class="btn-ui next" id="nextBtn" onclick="nextQuestion()">שאלה הבאה ➔</button>
+            </div>
         </div>
-    </section>
+    </div>
+</div>
 
-    <script>
-        // ─── נתונים (DATABASE) ───
-        const db = [
-            {t:"ביולוגיה", q:"מה הוא ה'תחנת הכוח' של התא?", o:["גרעין","מיטוכונדריה","ריבוזום","ממברנה"], a:1},
-            {t:"כימיה", q:"מהי הנוסחה הכימית של מים?", o:["H2O","CO2","NaCl","O2"], a:0},
-            {t:"פיזיקה", q:"מהו המרכיב העיקרי בסיבי פחמן (Carbon Fiber)?", o:["פלסטיק","פחמן","ברזל","זכוכית"], a:1},
-            {t:"ביולוגיה", q:"כמה לבבות יש לאדם?", o:["2","1","3","4"], a:1},
-            // תוסיף כאן את כל השאלות שלך באותו מבנה...
-        ];
+<script>
+    // --- המאגר שלך (JSON) ---
+    // כאן תדביק את כל ה-400 שורות שלך
+    const MASTER_DB = [
+        {l:1, t:"ביולוגיה", q:"מהו האיבר הגדול ביותר בגוף האדם?", o:["לב","ריאות","עור","מוח"], a:2},
+        {l:2, t:"כימיה", q:"מהו המספר האטומי של מימן?", o:["1","2","8","12"], a:0},
+        {l:3, t:"פיזיקה", q:"מהי מהירות האור בקירוב?", o:["300,000 קמ\"ש","300,000 קמ\"ש","1,000 קמ\"ש","10,000 קמ\"ש"], a:1},
+        {l:1, t:"חלל", q:"איזה כוכב לכת הוא הקרוב ביותר לשמש?", o:["מאדים","נוגה","חמה","צדק"], a:2}
+    ];
 
-        // ─── סאונדים ───
-        const sfxCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
-        const sfxWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3');
+    let filteredDB = [];
+    let currentIdx = 0;
+    let selectedSubject = 'all';
+    let selectedLevel = 'all';
+    let score = parseInt(localStorage.getItem('userXP')) || 0;
 
-        let answered = JSON.parse(localStorage.getItem('maor_quiz_progress')) || [];
+    const sfxCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
+    const sfxWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3');
 
-        function initQuiz() {
-            document.getElementById('hero').style.display = 'none';
-            document.getElementById('quiz-section').style.display = 'block';
-            updateStreak();
+    // 1. יצירת כפתורי מקצועות אוטומטית
+    function initMenu() {
+        const subjects = [...new Set(MASTER_DB.map(item => item.t))];
+        const grid = document.getElementById('subject-filters');
+        subjects.forEach(sub => {
+            const btn = document.createElement('button');
+            btn.className = 'filter-btn';
+            btn.innerText = sub;
+            btn.onclick = (e) => setSubject(sub, btn);
+            grid.appendChild(btn);
+        });
+        document.getElementById('xpVal').innerText = score;
+        document.getElementById('streakVal').innerText = localStorage.getItem('userStreak') || 0;
+    }
+
+    function setSubject(sub, btn) {
+        document.querySelectorAll('#subject-filters .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedSubject = sub;
+    }
+
+    function setLevel(lvl, btn) {
+        document.querySelectorAll('#menu-screen .filter-grid:nth-of-type(4) .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedLevel = lvl;
+    }
+
+    // 2. סינון המאגר והתחלה
+    function startMission() {
+        filteredDB = MASTER_DB.filter(item => {
+            const matchSub = (selectedSubject === 'all' || item.t === selectedSubject);
+            const matchLvl = (selectedLevel === 'all' || item.l == selectedLevel);
+            return matchSub && matchLvl;
+        });
+
+        if(filteredDB.length === 0) {
+            alert("לא נמצאו שאלות בסינון הזה. בחר שוב!");
+            return;
+        }
+
+        // ערבוב שאלות
+        filteredDB.sort(() => Math.random() - 0.5);
+        
+        document.getElementById('menu-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'block';
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const q = filteredDB[currentIdx];
+        document.getElementById('display-cat').innerText = q.t;
+        document.getElementById('display-lvl').innerText = `LVL: ${q.l}`;
+        document.getElementById('qText').innerText = q.q;
+        document.getElementById('nextBtn').style.display = 'none';
+        
+        const optsGrid = document.getElementById('opts');
+        optsGrid.innerHTML = '';
+
+        q.o.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(i, btn);
+            optsGrid.appendChild(btn);
+        });
+
+        updateProgress();
+    }
+
+    function checkAnswer(idx, btn) {
+        const q = filteredDB[currentIdx];
+        const allOpts = document.querySelectorAll('.option');
+        allOpts.forEach(b => b.disabled = true);
+
+        if(idx === q.a) {
+            btn.classList.add('correct');
+            sfxCorrect.play();
+            confetti({ particleCount: 30, spread: 60, origin: { y: 0.8 }, colors:['#00f5ff', '#7b2fff'] });
+            score += (q.l * 10);
+            localStorage.setItem('userXP', score);
+            document.getElementById('xpVal').innerText = score;
+        } else {
+            btn.classList.add('wrong');
+            allOpts[q.a].classList.add('correct');
+            sfxWrong.play();
+        }
+        document.getElementById('nextBtn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentIdx++;
+        if(currentIdx < filteredDB.length) {
             renderQuestion();
+        } else {
+            alert("המשימה הושלמה! כל הכבוד.");
+            location.reload();
         }
+    }
 
-        function updateStreak() {
-            const today = new Date().toDateString();
-            const last = localStorage.getItem('maor_last_date');
-            let streak = parseInt(localStorage.getItem('maor_streak')) || 0;
+    function updateProgress() {
+        const pct = (currentIdx / filteredDB.length) * 100;
+        document.getElementById('progress-bar').style.width = pct + "%";
+    }
 
-            if (last !== today) {
-                if (last === new Date(Date.now() - 86400000).toDateString()) streak++;
-                else streak = 1;
-                localStorage.setItem('maor_streak', streak);
-                localStorage.setItem('maor_last_date', today);
-            }
-            document.getElementById('streakLabel').innerText = `🔥 STREAK: ${streak}`;
-        }
-
-        function renderQuestion() {
-            let nextIdx = 0;
-            while(answered.includes(nextIdx) && answered.length < db.length) nextIdx++;
-
-            if (answered.length >= db.length) {
-                document.getElementById('qText').innerText = "כל הכבוד! סיימת את כל המאגר! 🏆";
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-                return;
-            }
-
-            const q = db[nextIdx];
-            document.getElementById('catLabel').innerText = q.t;
-            document.getElementById('qText').innerText = q.q;
-            document.getElementById('nextBtn').style.display = 'none';
-            
-            const optsBox = document.getElementById('opts');
-            optsBox.innerHTML = '';
-            
-            q.o.forEach((opt, i) => {
-                const b = document.createElement('button');
-                b.className = 'opt';
-                b.innerText = opt;
-                b.onclick = () => checkAns(i, b, nextIdx);
-                optsBox.appendChild(b);
-            });
-            updateUI();
-        }
-
-        function checkAns(idx, btn, qIdx) {
-            const q = db[qIdx];
-            const btns = document.querySelectorAll('.opt');
-            btns.forEach(b => b.disabled = true);
-
-            if (idx === q.a) {
-                btn.classList.add('correct');
-                sfxCorrect.play();
-                confetti({ particleCount: 40, spread: 50, colors: ['#00f5ff', '#00ff88'] });
-                if (!answered.includes(qIdx)) {
-                    answered.push(qIdx);
-                    localStorage.setItem('maor_quiz_progress', JSON.stringify(answered));
-                }
-            } else {
-                btn.classList.add('wrong');
-                btns[q.a].classList.add('correct');
-                sfxWrong.play();
-            }
-            document.getElementById('nextBtn').style.display = 'block';
-        }
-
-        function updateUI() {
-            const pct = (answered.length / db.length) * 100;
-            document.getElementById('xpFill').style.width = pct + "%";
-            document.getElementById('percentText').innerText = Math.floor(pct) + "%";
-            document.getElementById('qCount').innerText = `${answered.length}/${db.length} הושלמו`;
-        }
-
-        // ─── PARTICLES CORE ───
-        const canvas = document.getElementById('particles-canvas');
-        const ctx = canvas.getContext('2d');
-        let pts = [];
-        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.onresize = resize;
-        resize();
-
-        for(let i=0; i<80; i++) pts.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.4});
-
-        function anim() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            pts.forEach((p, i) => {
-                p.x += p.vx; p.y += p.vy;
-                if(p.x<0 || p.x>canvas.width) p.vx *= -1;
-                if(p.y<0 || p.y>canvas.height) p.vy *= -1;
-                ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
-                ctx.fillStyle = "rgba(0, 245, 255, 0.3)"; ctx.fill();
-                
-                for(let j=i+1; j<pts.length; j++) {
-                    let p2 = pts[j];
-                    let d = Math.hypot(p.x-p2.x, p.y-p2.y);
-                    if(d < 120) {
-                        ctx.beginPath(); ctx.strokeStyle = `rgba(0, 245, 255, ${1 - d/120})`;
-                        ctx.lineWidth = 0.5; ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
-                    }
-                }
-            });
-            requestAnimationFrame(anim);
-        }
-        anim();
-    </script>
+    // --- Background Animation ---
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let pts = [];
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.onresize = resize; resize();
+    for(let i=0; i<60; i++) pts.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: 0.2, vy: 0.2});
+    function draw() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = "rgba(0, 245, 255, 0.2)";
+        pts.forEach(p => {
+            p.x += p.vx; p.y += p.vy;
+            if(p.x > canvas.width) p.x = 0; if(p.y > canvas.height) p.y = 0;
+            ctx.beginPath(); ctx.arc(p.x, p.y, 1.5, 0, Math.PI*2); ctx.fill();
+        });
+        requestAnimationFrame(draw);
+    }
+    draw();
+    initMenu();
+</script>
 </body>
 </html>
