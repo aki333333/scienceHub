@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCIENCE X | DEVELOPED BY MAOR</title>
+    <title>SCIENCE X | MAOR</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Heebo:wght@300;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
             --cyan: #00f5ff; --red: #ff3e3e; --green: #00ff88; --bg: #03070c;
             --carbon: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.04) 1px, transparent 0);
-            --neon-glow: 0 0 15px rgba(0,245,255,0.4);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
         body { 
             font-family: 'Heebo', sans-serif; background: var(--bg); color: #fff; 
             overflow-x: hidden; min-height: 100vh;
@@ -21,72 +20,67 @@
         }
 
         #particles-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.3; }
-        .container { position: relative; z-index: 1; max-width: 950px; margin: 0 auto; padding: 25px; }
+        .container { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 20px; }
 
         /* --- UI HEADER --- */
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .logo { font-family: 'Orbitron'; font-weight: 900; font-size: 1.8rem; color: var(--cyan); text-shadow: var(--neon-glow); }
-        .maor-badge { font-family: 'Orbitron'; font-size: 10px; color: var(--cyan); border: 1px solid var(--cyan); padding: 4px 10px; border-radius: 4px; letter-spacing: 2px; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px; }
+        .brand { font-family: 'Orbitron'; font-weight: 900; font-size: 1.8rem; color: var(--cyan); text-shadow: 0 0 15px rgba(0,245,255,0.5); }
+        
+        .controls { display: flex; gap: 15px; align-items: center; }
+        .sound-toggle { background: rgba(255,255,255,0.05); border: 1px solid var(--cyan); color: var(--cyan); padding: 5px 12px; border-radius: 5px; cursor: pointer; font-family: 'Orbitron'; font-size: 10px; }
 
         .hud { 
-            display: flex; gap: 25px; align-items: center; background: rgba(255,255,255,0.02); 
-            padding: 15px 30px; border-radius: 15px; border: 1px solid rgba(0,245,255,0.1); backdrop-filter: blur(12px);
+            display: flex; gap: 20px; align-items: center; background: rgba(255,255,255,0.03); 
+            padding: 12px 25px; border-radius: 50px; border: 1px solid rgba(0,245,255,0.15); backdrop-filter: blur(10px);
         }
 
         /* --- PRO HEARTS (SVG) --- */
-        .hearts-box { display: flex; gap: 10px; }
-        .heart-icon { width: 24px; height: 24px; fill: var(--red); filter: drop-shadow(0 0 8px var(--red)); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .heart-icon.empty { fill: #1a1a1a; filter: none; transform: scale(0.8); opacity: 0.3; }
+        .hearts-box { display: flex; gap: 8px; }
+        .heart-icon { width: 22px; height: 22px; fill: var(--red); filter: drop-shadow(0 0 5px var(--red)); transition: 0.3s; }
+        .heart-icon.lost { fill: #1a1a1a; filter: none; opacity: 0.3; }
 
-        /* --- PROGRESS SYSTEM --- */
-        .xp-engine { width: 100%; margin: 25px 0; }
-        .xp-top { display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 12px; margin-bottom: 10px; color: var(--cyan); }
-        .xp-track { height: 10px; background: rgba(255,255,255,0.03); border-radius: 5px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
-        #xp-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #0066ff, var(--cyan)); transition: 0.7s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 20px rgba(0,245,255,0.5); }
+        /* --- XP BAR --- */
+        .xp-engine { width: 100%; margin-bottom: 30px; }
+        .xp-info { display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 11px; margin-bottom: 8px; color: var(--cyan); }
+        .xp-track { height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+        #xp-bar { height: 100%; width: 0%; background: var(--cyan); box-shadow: 0 0 15px var(--cyan); transition: 0.6s; }
 
-        /* --- GAME CARD --- */
-        #game-frame { display: none; }
+        /* --- SCREENS --- */
         .card { 
-            background: linear-gradient(145deg, rgba(15,20,30,0.95), rgba(5,10,15,0.98)); 
-            border: 1px solid rgba(0,245,255,0.15); border-radius: 40px; padding: 50px; 
-            position: relative; box-shadow: 0 40px 100px rgba(0,0,0,0.9);
+            background: rgba(10, 15, 25, 0.95); border: 1px solid rgba(0,245,255,0.1); 
+            border-radius: 30px; padding: 40px; position: relative; box-shadow: 0 30px 60px rgba(0,0,0,0.8);
         }
 
         .streak-fire { 
-            position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
-            background: linear-gradient(135deg, #ff9900, #ff2200); padding: 12px 35px;
+            position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(to bottom, #ff8800, #ff4400); padding: 10px 25px;
             border-radius: 50px; font-family: 'Orbitron'; font-weight: 900; display: none;
-            box-shadow: 0 0 30px #ff4400; animation: fire-pulse 0.4s infinite alternate;
+            box-shadow: 0 0 20px #ff4400; animation: pulse 0.4s infinite alternate;
         }
-        @keyframes fire-pulse { from { transform: translateX(-50%) scale(1); opacity: 0.9; } to { transform: translateX(-50%) scale(1.1); opacity: 1; } }
+        @keyframes pulse { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(1.1); } }
 
-        .q-text { font-size: 2rem; font-weight: 900; margin-bottom: 35px; line-height: 1.2; text-align: center; }
+        .q-text { font-size: 1.8rem; font-weight: 900; margin-bottom: 30px; line-height: 1.3; text-align: center; }
 
-        .opt-grid { display: grid; gap: 15px; }
+        .opt-grid { display: grid; gap: 12px; }
         .opt-btn { 
-            width: 100%; padding: 22px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.05);
+            width: 100%; padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05);
             background: rgba(255,255,255,0.02); color: #fff; cursor: pointer; text-align: right;
-            font-size: 1.2rem; transition: 0.3s;
+            font-size: 1.1rem; transition: 0.2s;
         }
-        .opt-btn:hover:not(:disabled) { background: rgba(0,245,255,0.08); border-color: var(--cyan); transform: translateX(-5px); }
-        .opt-btn.correct { background: var(--green) !important; color: #000; font-weight: 900; border-color: var(--green); box-shadow: 0 0 30px rgba(0,255,136,0.4); }
-        .opt-btn.wrong { background: var(--red) !important; border-color: var(--red); box-shadow: 0 0 30px rgba(255,62,62,0.4); }
+        .opt-btn:hover:not(:disabled) { background: rgba(0,245,255,0.08); border-color: var(--cyan); }
+        .opt-btn.correct { background: var(--green) !important; color: #000; font-weight: 900; border-color: var(--green); }
+        .opt-btn.wrong { background: var(--red) !important; border-color: var(--red); }
 
-        .action-btn { width: 100%; padding: 22px; background: var(--cyan); color: #000; border: none; border-radius: 18px; font-family: 'Orbitron'; font-weight: 900; cursor: pointer; margin-top: 30px; display: none; transition: 0.2s; }
-        .action-btn:hover { background: #fff; transform: scale(1.02); }
+        .next-btn { width: 100%; padding: 20px; background: var(--cyan); color: #000; border: none; border-radius: 15px; font-family: 'Orbitron'; font-weight: 900; cursor: pointer; margin-top: 25px; display: none; }
 
         /* --- MENU --- */
-        .sector-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin-top: 40px; }
-        .sector-card { 
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(0,245,255,0.1); 
-            padding: 50px 20px; border-radius: 30px; cursor: pointer; transition: 0.4s; text-align: center;
-        }
-        .sector-card:hover { border-color: var(--cyan); background: rgba(0,245,255,0.08); transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,245,255,0.1); }
-        .sector-card h3 { font-family: 'Orbitron'; margin-top: 15px; color: var(--cyan); }
+        .sector-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
+        .sector-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,245,255,0.1); padding: 40px 20px; border-radius: 25px; cursor: pointer; text-align: center; transition: 0.3s; }
+        .sector-card:hover { border-color: var(--cyan); background: rgba(0,245,255,0.08); transform: translateY(-5px); }
+        .sector-card h3 { font-family: 'Orbitron'; color: var(--cyan); margin-top: 10px; }
 
-        /* --- FOOTER --- */
-        footer { margin-top: 80px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 30px; font-family: 'Orbitron'; font-size: 11px; color: rgba(255,255,255,0.2); }
-        .maor-sig { color: var(--cyan); font-weight: 900; text-shadow: 0 0 5px var(--cyan); }
+        footer { margin-top: 60px; text-align: center; font-family: 'Orbitron'; font-size: 11px; color: rgba(255,255,255,0.2); letter-spacing: 2px; }
+        .maor { color: var(--cyan); font-weight: bold; }
     </style>
 </head>
 <body>
@@ -95,159 +89,163 @@
 
 <div class="container">
     <header>
-        <div class="logo">SCIENCE X</div>
-        <div class="maor-badge">CHIEF ARCHITECT: MAOR</div>
-        <div class="hud">
-            <div class="hearts-box" id="hearts-ui">
-                <svg class="heart-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                <svg class="heart-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                <svg class="heart-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <div class="brand">SCIENCE X</div>
+        <div class="controls">
+            <button class="sound-toggle" onclick="toggleSound()" id="soundBtn">SOUND: ON</button>
+            <div class="hud">
+                <div class="hearts-box" id="hearts-ui">
+                    <svg class="heart-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    <svg class="heart-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    <svg class="heart-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
+                <div id="xp-num" style="font-family:'Orbitron'; font-weight:900; color:var(--cyan);">0 XP</div>
             </div>
-            <div id="xp-display" style="font-family:'Orbitron'; font-weight:900; color:var(--cyan); min-width:80px; text-align:right;">0 XP</div>
         </div>
     </header>
 
     <div class="xp-engine">
-        <div class="xp-top"><span>CORE SYNCHRONIZATION</span><span id="lvl-tag">RANK: INITIATE</span></div>
+        <div class="xp-info"><span>SYSTEM SYNC</span><span id="rank">RANK: INITIATE</span></div>
         <div class="xp-track"><div id="xp-bar"></div></div>
     </div>
 
-    <main id="menu-frame">
-        <h2 style="text-align:center; font-family:'Orbitron'; letter-spacing:5px; margin-bottom:10px;">SELECT DOMAIN</h2>
+    <div id="menu-screen">
         <div class="sector-grid">
-            <div class="sector-card" onclick="init('ביולוגיה')"><h1>🧬</h1><h3>BIOLOGY</h3></div>
-            <div class="sector-card" onclick="init('כימיה')"><h1>🧪</h1><h3>CHEMISTRY</h3></div>
-            <div class="sector-card" onclick="init('פיזיקה')"><h1>⚡</h1><h3>PHYSICS</h3></div>
-            <div class="sector-card" onclick="init('רפואה')"><h1>⚕️</h1><h3>MEDICAL</h3></div>
+            <div class="sector-card" onclick="start('ביולוגיה')"><h2>🧬</h2><h3>BIOLOGY</h3></div>
+            <div class="sector-card" onclick="start('כימיה')"><h2>🧪</h2><h3>CHEMISTRY</h3></div>
+            <div class="sector-card" onclick="start('פיזיקה')"><h2>⚡</h2><h3>PHYSICS</h3></div>
+            <div class="sector-card" onclick="start('רפואה')"><h2>⚕️</h2><h3>MEDICAL</h3></div>
         </div>
-    </main>
+    </div>
 
-    <main id="game-frame">
+    <div id="game-screen" style="display:none;">
         <div class="card">
-            <div id="streak-fire" class="streak-fire">STREAK: <span id="fire-count">0</span> 🔥</div>
-            <div class="q-text" id="question-label">INITIALIZING MISSION...</div>
-            <div class="opt-grid" id="options-holder"></div>
-            <button id="btn-next" class="action-btn" onclick="next()">NEXT SEQUENCE ➔</button>
+            <div id="streak-fire" class="streak-fire">STREAK: <span id="fire-val">0</span> 🔥</div>
+            <div class="q-text" id="q-label">Loading...</div>
+            <div class="opt-grid" id="options"></div>
+            <button id="next-btn" class="next-btn" onclick="nextQuestion()">NEXT SEQUENCE ➔</button>
         </div>
-    </main>
+    </div>
 
     <footer>
-        ENGINEERED BY <span class="maor-sig">MAOR</span> | ALL SYSTEM RIGHTS RESERVED<br>
-        &copy; 2026 SCIENCE X INFRASTRUCTURE | VERSION 7.0.4
+        DESIGNED & DEVELOPED BY <span class="maor">MAOR AVITBOL</span> &copy; 2026<br>
+        SCIENCE X ENGINE V8.0 | SECURE CONNECTED
     </footer>
 </div>
 
 <script>
-// --- AUDIO (PRO ASSETS) ---
+// --- AUDIO SYSTEM ---
+let soundEnabled = true;
 const sfx = {
-    ok: new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3'),
-    no: new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3'),
-    end: new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3')
+    win: new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3'),
+    fail: new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3'),
+    clear: new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3')
 };
 
-// --- SYSTEM LOGIC ---
-let db = [], mission = [], cur = 0, xp = 0, lives = 3, streak = 0;
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    document.getElementById('soundBtn').innerText = `SOUND: ${soundEnabled ? 'ON' : 'OFF'}`;
+}
 
-async function boot() {
+function play(key) { if(soundEnabled) { sfx[key].currentTime = 0; sfx[key].play(); } }
+
+// --- DATA & LOGIC ---
+let questions = [], pool = [], cur = 0, xp = 0, lives = 3, streak = 0;
+
+async function load() {
     try {
         const r = await fetch('questions.json');
-        db = await r.json();
-    } catch(e) { console.error("Database offline."); }
+        questions = await r.json();
+    } catch(e) { console.error("Missing Database."); }
 }
 
-function init(cat) {
-    mission = db.filter(q => q.t === cat).sort(() => 0.5 - Math.random());
-    if(!mission.length) return alert("Domain empty.");
-    document.getElementById('menu-frame').style.display = 'none';
-    document.getElementById('game-frame').style.display = 'block';
-    next();
+function start(cat) {
+    pool = questions.filter(q => q.t === cat).sort(() => 0.5 - Math.random());
+    document.getElementById('menu-screen').style.display = 'none';
+    document.getElementById('game-screen').style.display = 'block';
+    nextQuestion();
 }
 
-function next() {
-    if(cur >= mission.length) {
-        sfx.end.play();
-        confetti({ particleCount: 300, spread: 120, origin: { y: 0.6 } });
-        alert("DOMAIN CLEARED!");
+function nextQuestion() {
+    if(cur >= pool.length || lives <= 0) {
+        play('clear');
+        confetti({ particleCount: 200, spread: 70 });
+        alert(lives > 0 ? "MISSION COMPLETE!" : "SYSTEM FAILURE.");
         location.reload();
         return;
     }
 
-    const q = mission[cur];
-    document.getElementById('question-label').innerText = q.q;
-    const holder = document.getElementById('options-holder');
-    holder.innerHTML = '';
+    const q = pool[cur];
+    document.getElementById('q-label').innerText = q.q;
+    const box = document.getElementById('options');
+    box.innerHTML = '';
     
-    q.o.forEach((t, i) => {
-        const b = document.createElement('button');
-        b.className = 'opt-btn';
-        b.innerText = t;
-        b.onclick = () => verify(i, b, q.a);
-        holder.appendChild(b);
+    q.o.forEach((text, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = text;
+        btn.onclick = () => check(i, btn, q.a);
+        box.appendChild(btn);
     });
 
-    document.getElementById('btn-next').style.display = 'none';
+    document.getElementById('next-btn').style.display = 'none';
     document.getElementById('streak-fire').style.display = streak >= 3 ? 'block' : 'none';
-    document.getElementById('fire-count').innerText = streak;
+    document.getElementById('fire-val').innerText = streak;
 }
 
-function verify(idx, btn, ans) {
-    const all = document.querySelectorAll('.opt-btn');
-    all.forEach(b => b.disabled = true);
+function check(idx, btn, correct) {
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => b.disabled = true);
 
-    if(idx === ans) {
+    if(idx === correct) {
         btn.classList.add('correct');
         streak++;
-        xp += (25 + (streak * 5));
-        sfx.ok.play();
-        confetti({ particleCount: 50, spread: 60, colors: ['#00f5ff', '#ffffff'] });
+        xp += (20 + streak * 5);
+        play('win');
     } else {
         btn.classList.add('wrong');
-        all[ans].classList.add('correct');
+        btns[correct].classList.add('correct');
         streak = 0;
         lives--;
-        sfx.no.play();
-        syncHearts();
+        play('fail');
+        updateLives();
     }
 
-    syncUI();
+    updateUI();
     cur++;
-    document.getElementById('btn-next').style.display = 'block';
+    document.getElementById('next-btn').style.display = 'block';
 }
 
-function syncHearts() {
+function updateLives() {
     const hearts = document.querySelectorAll('.heart-icon');
     for(let i=0; i<3; i++) {
-        if(i >= lives) hearts[2-i].classList.add('empty');
-    }
-    if(lives <= 0) {
-        setTimeout(() => { alert("CRITICAL FAILURE: SYSTEM SHUTDOWN"); location.reload(); }, 600);
+        if(i >= lives) hearts[2-i].classList.add('lost');
     }
 }
 
-function syncUI() {
-    document.getElementById('xp-display').innerText = `${xp} XP`;
-    const p = Math.min((xp / 1000) * 100, 100);
-    document.getElementById('xp-bar').style.width = p + "%";
-    if(xp > 500) document.getElementById('lvl-tag').innerText = "RANK: ELITE";
+function updateUI() {
+    document.getElementById('xp-num').innerText = `${xp} XP`;
+    const progress = Math.min((xp / 1000) * 100, 100);
+    document.getElementById('xp-bar').style.width = progress + "%";
+    if(xp > 500) document.getElementById('rank').innerText = "RANK: ELITE";
 }
 
-boot();
+load();
 
-// Particle Engine
+// Background
 (function(){
     const c = document.getElementById('particles-canvas');
-    const x = c.getContext('2d');
+    const ctx = c.getContext('2d');
     let w, h;
     function r(){ w = c.width = window.innerWidth; h = c.height = window.innerHeight; }
     window.onresize = r; r();
-    function f(){
-        x.clearRect(0,0,w,h); x.fillStyle = "rgba(0, 245, 255, 0.4)";
-        for(let i=0; i<40; i++){
-            x.beginPath(); x.arc(Math.random()*w, Math.random()*h, 1.2, 0, Math.PI*2); x.fill();
+    function d(){
+        ctx.clearRect(0,0,w,h); ctx.fillStyle = "#00f5ff";
+        for(let i=0; i<35; i++){
+            ctx.beginPath(); ctx.arc(Math.random()*w, Math.random()*h, 1, 0, Math.PI*2); ctx.fill();
         }
-        setTimeout(() => requestAnimationFrame(f), 80);
+        setTimeout(() => requestAnimationFrame(d), 100);
     }
-    f();
+    d();
 })();
 </script>
 </body>
