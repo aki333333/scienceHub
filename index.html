@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מדע בכיף - Pro Edition</title>
+    <title>מדע בכיף - Pro System</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Heebo:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -12,56 +12,69 @@
             --bg: #020810; --card: rgba(255,255,255,0.03); --border: rgba(0,245,255,0.2);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Heebo', sans-serif; background: var(--bg); color: #fff; overflow-x: hidden; }
+        body { font-family: 'Heebo', sans-serif; background: var(--bg); color: #fff; overflow: hidden; height: 100vh; }
 
+        /* רקע חלקיקים */
         #bg-canvas { position: fixed; inset: 0; z-index: -1; }
 
-        .container { max-width: 850px; margin: 0 auto; padding: 20px; min-height: 100vh; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; position: relative; z-index: 10; }
 
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: var(--card); border-radius: 20px; border: 1px solid var(--border); margin-bottom: 20px; backdrop-filter: blur(10px); }
-        .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
+        header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 15px 25px; background: var(--card); border-radius: 20px; 
+            border: 1px solid var(--border); margin-bottom: 20px; backdrop-filter: blur(10px); 
+        }
+        .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--cyan); letter-spacing: 2px; }
         
-        /* אזהרה רפואית */
         .medical-warning { 
             background: rgba(255, 68, 102, 0.1); border: 1px solid var(--red); 
-            padding: 10px; border-radius: 10px; color: var(--red); 
-            font-size: 12px; text-align: center; margin-bottom: 15px; display: none;
-            animation: pulse 2s infinite;
+            padding: 12px; border-radius: 12px; color: var(--red); 
+            font-size: 13px; text-align: center; margin-bottom: 20px; font-weight: bold;
+            animation: flash 2s infinite;
         }
-        @keyframes pulse { 0% {opacity: 1} 50% {opacity: 0.6} 100% {opacity: 1} }
+        @keyframes flash { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
-        /* מסך בחירה */
-        #menu-screen { text-align: center; animation: fadeIn 0.5s; }
-        .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin: 20px 0; }
-        .filter-btn {
-            background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 12px;
-            color: #fff; cursor: pointer; transition: 0.3s; font-weight: bold;
+        .screen { display: none; animation: fadeIn 0.4s ease; }
+        .screen.active { display: block; }
+
+        /* גריד כפתורים */
+        .subject-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        .subject-btn {
+            background: var(--card); border: 1px solid var(--border); 
+            padding: 25px; border-radius: 20px; color: #fff; cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center;
         }
-        .filter-btn.active { background: var(--cyan); color: #000; border-color: var(--cyan); box-shadow: 0 0 15px var(--cyan); }
-        .filter-btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
-
-        .start-btn {
-            width: 100%; padding: 20px; border-radius: 50px; border: none; font-family: 'Orbitron';
-            background: linear-gradient(90deg, var(--blue), var(--purple)); color: #fff; font-size: 18px;
-            font-weight: 900; cursor: pointer; margin-top: 20px;
+        .subject-btn:hover:not(:disabled) { 
+            border-color: var(--cyan); transform: translateY(-5px); 
+            background: rgba(0, 245, 255, 0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
+        .subject-btn h3 { font-family: 'Orbitron'; font-size: 18px; margin-bottom: 8px; color: var(--cyan); }
+        .subject-btn span { font-size: 12px; color: #aaa; }
+        .subject-btn:disabled { opacity: 0.2; cursor: not-allowed; filter: grayscale(1); }
 
-        /* מסך קוויז */
-        #quiz-screen, #level-up-screen { display: none; animation: fadeIn 0.5s; }
+        /* Quiz UI */
         .card { background: var(--card); border: 1px solid var(--border); border-radius: 25px; padding: 30px; backdrop-filter: blur(15px); }
-        
         .option {
             width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); 
             padding: 18px; border-radius: 15px; color: #fff; text-align: right; 
-            margin-bottom: 10px; cursor: pointer; transition: 0.2s;
+            margin-bottom: 12px; cursor: pointer; transition: 0.2s; font-size: 17px;
         }
-        .option.correct { background: var(--green) !important; color: #000; }
-        .option.wrong { background: var(--red) !important; color: #fff; }
+        .option:hover:not(:disabled) { background: rgba(255,255,255,0.15); border-color: #fff; }
+        .option.correct { background: var(--green) !important; color: #000; font-weight: 700; border-color: var(--green); }
+        .option.wrong { background: var(--red) !important; color: #fff; border-color: var(--red); }
 
-        .progress-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 20px 0; overflow: hidden; }
-        #progress-fill { height: 100%; background: var(--cyan); width: 0%; transition: 0.4s; }
+        .progress-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+        #progress-fill { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--blue)); width: 0%; transition: 0.5s ease-out; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .btn-action { 
+            width: 100%; padding: 18px; border-radius: 50px; border: none; 
+            font-family: 'Orbitron'; font-weight: 900; cursor: pointer; margin-top: 20px; 
+            transition: 0.3s;
+        }
+        .btn-next { background: var(--cyan); color: #000; }
+        .btn-next:hover { box-shadow: 0 0 20px var(--cyan); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -70,124 +83,105 @@
 
 <div class="container">
     <header>
-        <div class="logo">SCIENCE SYSTEM V3</div>
-        <div id="stats" style="font-family: 'Orbitron'; font-size: 14px;">XP: <span id="xpDisplay">0</span> | LVL: <span id="lvlDisplay">1</span></div>
+        <div class="logo">SCIENCE X</div>
+        <div style="font-family: 'Orbitron'; font-size: 14px;">
+            XP: <span id="xpDisplay" style="color:var(--cyan)">0</span> | 
+            LVL: <span id="lvlDisplay" style="color:var(--green)">1</span>
+        </div>
     </header>
 
-    <div id="medical-alert" class="medical-warning">⚠️ אזהרה: המידע בקטגוריית רפואה הוא לימודי בלבד. אין להשתמש בו לייעוץ רפואי או טיפול!</div>
-
-    <div id="menu-screen">
-        <h2 style="font-family: 'Orbitron'; margin-bottom: 20px;">SELECT SUBJECT</h2>
-        <div class="filter-grid" id="subject-filters">
-            <button class="filter-btn active" onclick="setSubject('all', this)">כל המקצועות</button>
-        </div>
+    <div id="menu-screen" class="screen active">
+        <div class="medical-warning">⚠️ אזהרה: המידע לימודי בלבד. אין להסתמך עליו לצרכים רפואיים!</div>
+        <h2 style="text-align: center; font-family: 'Orbitron'; margin-bottom: 25px; letter-spacing: 1px;">CHOOSE MISSION</h2>
         
-        <h2 style="font-family: 'Orbitron'; margin-top: 30px;">CHOOSE LEVEL</h2>
-        <div class="filter-grid" id="level-filters">
-            <button class="filter-btn active" id="btn-lvl-1" onclick="setLevel(1, this)">LEVEL 1</button>
-            <button class="filter-btn" id="btn-lvl-2" onclick="setLevel(2, this)" disabled>LEVEL 2 🔒</button>
-            <button class="filter-btn" id="btn-lvl-3" onclick="setLevel(3, this)" disabled>LEVEL 3 🔒</button>
+        <div class="subject-grid">
+            <button class="subject-btn" onclick="startQuiz('רפואה')">
+                <h3>MEDICAL</h3>
+                <span>רפואה ומערכות הגוף</span>
+            </button>
+            <button class="subject-btn" onclick="startQuiz('פיזיקה')">
+                <h3>PHYSICS</h3>
+                <span>חוקי טבע וחלל</span>
+            </button>
+            <button class="subject-btn" onclick="startQuiz('כימיה')">
+                <h3>CHEMISTRY</h3>
+                <span>יסודות ותגובות</span>
+            </button>
+            <button id="lvl2-btn" class="subject-btn" onclick="startQuiz('lvl2')">
+                <h3>LEVEL 2</h3>
+                <span id="lvl2-status">🔒 נעול - סיים רמה 1</span>
+            </button>
         </div>
-
-        <button class="start-btn" onclick="startQuiz()">LAUNCH MISSION</button>
     </div>
 
-    <div id="quiz-screen">
+    <div id="quiz-screen" class="screen">
         <div class="progress-bar"><div id="progress-fill"></div></div>
         <div class="card">
-            <div id="qCategory" style="color: var(--cyan); font-family: 'Orbitron'; font-size: 12px; margin-bottom: 10px;"></div>
-            <h2 id="qText" style="margin-bottom: 25px;">טוען שאלה...</h2>
+            <div id="qLabel" style="font-family: 'Orbitron'; font-size: 11px; color: var(--cyan); margin-bottom: 10px; opacity: 0.8;">MISSION IN PROGRESS</div>
+            <h2 id="qText" style="margin-bottom: 25px; line-height: 1.4;"></h2>
             <div id="opts"></div>
-            <button id="nextBtn" class="start-btn" style="display:none; font-size: 14px;" onclick="renderQuestion()">השאלה הבאה ➔</button>
+            <button id="nextBtn" class="btn-action btn-next" style="display:none;" onclick="handleNext()">המשך ➔</button>
         </div>
     </div>
 
-    <div id="level-up-screen" class="card" style="text-align: center;">
-        <h1 style="font-family: 'Orbitron'; color: var(--green); font-size: 40px;">LEVEL UP!</h1>
-        <p id="levelUpText" style="margin: 20px 0; font-size: 18px;"></p>
-        <button class="start-btn" onclick="location.reload()">חזרה לתפריט ופתיחת רמה חדשה</button>
+    <div id="finish-screen" class="screen card" style="text-align: center;">
+        <h1 id="finishTitle" style="font-family: 'Orbitron'; color: var(--green); font-size: 40px;">LEVEL UP!</h1>
+        <p id="finishText" style="margin: 20px 0; font-size: 18px; color: #ddd;"></p>
+        <button class="btn-action btn-next" onclick="location.reload()">חזרה לתפריט</button>
     </div>
 </div>
 
 <script>
-    // מאגר שאלות לדוגמה (תחליף ב-JSON המלא שלך)
+    // --- מאגר נתונים ---
+    // כאן תכניס את ה-400 שורות שלך
     const MASTER_DB = [
-        {l:1, t:"רפואה", q:"מהו לחץ דם תקין בממוצע?", o:["120/80","180/100","90/60","150/90"], a:0},
-        {l:1, t:"פיזיקה", q:"מהירות הקול גבוהה יותר במים מאשר באוויר?", o:["נכון","לא נכון"], a:0},
-        {l:2, t:"ביולוגיה", q:"איזה הורמון מווסת את רמת הסוכר בדם?", o:["אדרנלין","אינסולין","טירוקסין","קורטיזול"], a:1},
-        // ... המאגר שלך ממשיך כאן
+        {l:1, t:"רפואה", q:"מהו האיבר הגדול ביותר בגוף?", o:["לב","עור","כבד","ריאות"], a:1},
+        {l:1, t:"פיזיקה", q:"מי גילה את כוח המשיכה?", o:["איינשטיין","ניוטון","טסלה","גלילאו"], a:1},
+        {l:1, t:"כימיה", q:"מהו הסמל הכימי של זהב?", o:["Ag","Fe","Au","Pb"], a:2},
+        {l:2, t:"lvl2", q:"שאלה מתקדמת לרמה 2?", o:["תשובה 1","תשובה 2","תשובה 3","תשובה 4"], a:0}
     ];
 
-    let currentSubject = 'all';
-    let currentLevel = 1;
-    let filteredQuestions = [];
-    let currentIndex = 0;
-    let xp = parseInt(localStorage.getItem('xp')) || 0;
-    let unlockedLevel = parseInt(localStorage.getItem('unlockedLevel')) || 1;
+    let currentQuestions = [];
+    let qIndex = 0;
+    let xp = parseInt(localStorage.getItem('scix_xp')) || 0;
+    let unlocked = parseInt(localStorage.getItem('scix_lvl')) || 1;
 
     const sndCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
-    const sndWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3');
 
     function init() {
-        // עדכון UI
         document.getElementById('xpDisplay').innerText = xp;
-        document.getElementById('lvlDisplay').innerText = unlockedLevel;
+        document.getElementById('lvlDisplay').innerText = unlocked;
         
-        // פתיחת כפתורי רמות
-        for(let i=1; i<=unlockedLevel; i++) {
-            const btn = document.getElementById(`btn-lvl-${i}`);
-            if(btn) {
-                btn.disabled = false;
-                if(i > 1) btn.innerText = `LEVEL ${i}`;
-            }
+        if(unlocked >= 2) {
+            const btn2 = document.getElementById('lvl2-btn');
+            btn2.disabled = false;
+            document.getElementById('lvl2-status').innerText = "🔓 פתוח - בהצלחה!";
+        }
+    }
+
+    function startQuiz(type) {
+        // סינון חכם: אם בחרנו מקצוע, נביא שאלות מקצוע. אם בחרנו רמה, נביא לפי רמה.
+        if(type === 'lvl2') {
+            currentQuestions = MASTER_DB.filter(q => q.l === 2);
+        } else {
+            currentQuestions = MASTER_DB.filter(q => q.t === type && q.l === 1);
         }
 
-        // יצירת כפתורי מקצועות
-        const subjects = [...new Set(MASTER_DB.map(i => i.t))];
-        const filterGrid = document.getElementById('subject-filters');
-        subjects.forEach(s => {
-            const b = document.createElement('button');
-            b.className = 'filter-btn';
-            b.innerText = s;
-            b.onclick = () => setSubject(s, b);
-            filterGrid.appendChild(b);
-        });
-    }
-
-    function setSubject(s, btn) {
-        document.querySelectorAll('#subject-filters .filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentSubject = s;
-        // הצגת אזהרה אם נבחר רפואה
-        document.getElementById('medical-alert').style.display = (s === 'רפואה' || s === 'all') ? 'block' : 'none';
-    }
-
-    function setLevel(l, btn) {
-        document.querySelectorAll('#level-filters .filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentLevel = l;
-    }
-
-    function startQuiz() {
-        filteredQuestions = MASTER_DB.filter(q => 
-            (currentSubject === 'all' || q.t === currentSubject) && q.l === currentLevel
-        ).sort(() => Math.random() - 0.5);
-
-        if(filteredQuestions.length === 0) return alert("אין שאלות ברמה/מקצוע הזה כרגע.");
-
-        document.getElementById('menu-screen').style.display = 'none';
-        document.getElementById('quiz-screen').style.display = 'block';
+        if(currentQuestions.length === 0) return alert("המשימה עדיין לא מוכנה (אין שאלות).");
+        
+        currentQuestions.sort(() => Math.random() - 0.5); // ערבוב
+        qIndex = 0;
+        showScreen('quiz-screen');
         renderQuestion();
     }
 
     function renderQuestion() {
-        if(currentIndex >= filteredQuestions.length) {
-            handleLevelComplete();
+        if(qIndex >= currentQuestions.length) {
+            handleComplete();
             return;
         }
 
-        const q = filteredQuestions[currentIndex];
-        document.getElementById('qCategory').innerText = q.t.toUpperCase();
+        const q = currentQuestions[qIndex];
         document.getElementById('qText').innerText = q.q;
         document.getElementById('nextBtn').style.display = 'none';
         
@@ -195,66 +189,91 @@
         optsDiv.innerHTML = '';
 
         q.o.forEach((opt, i) => {
-            const b = document.createElement('button');
-            b.className = 'option';
-            b.innerText = opt;
-            b.onclick = () => checkAnswer(i, b, q.a);
-            optsDiv.appendChild(b);
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerText = opt;
+            btn.onclick = () => check(i, btn, q.a);
+            optsDiv.appendChild(btn);
         });
 
-        document.getElementById('progress-fill').style.width = (currentIndex / filteredQuestions.length * 100) + "%";
+        const progress = (qIndex / currentQuestions.length) * 100;
+        document.getElementById('progress-fill').style.width = progress + "%";
     }
 
-    function checkAnswer(idx, btn, correct) {
-        const all = document.querySelectorAll('.option');
-        all.forEach(b => b.disabled = true);
+    function check(idx, btn, correct) {
+        const buttons = document.querySelectorAll('.option');
+        buttons.forEach(b => b.disabled = true);
 
         if(idx === correct) {
             btn.classList.add('correct');
             sndCorrect.play();
-            confetti({ particleCount: 50, spread: 70, origin: { y: 0.8 } });
+            confetti({ particleCount: 40, spread: 60, origin: { y: 0.8 } });
             xp += 10;
-            localStorage.setItem('xp', xp);
+            localStorage.setItem('scix_xp', xp);
             document.getElementById('xpDisplay').innerText = xp;
         } else {
             btn.classList.add('wrong');
-            all[correct].classList.add('correct');
-            sndWrong.play();
+            buttons[correct].classList.add('correct');
         }
         document.getElementById('nextBtn').style.display = 'block';
     }
 
-    function handleLevelComplete() {
-        document.getElementById('quiz-screen').style.display = 'none';
-        document.getElementById('level-up-screen').style.display = 'block';
-        
-        if(currentLevel === unlockedLevel && unlockedLevel < 3) {
-            unlockedLevel++;
-            localStorage.setItem('unlockedLevel', unlockedLevel);
-            document.getElementById('levelUpText').innerText = `מדהים! סיימת את רמה ${currentLevel} ופתחת את רמה ${unlockedLevel}!`;
-            confetti({ particleCount: 200, spread: 100 });
-        } else {
-            document.getElementById('levelUpText').innerText = `סיימת את כל השאלות בסינון הנוכחי!`;
-        }
+    function handleNext() {
+        qIndex++;
+        renderQuestion();
     }
 
-    // אנימציית רקע
+    function handleComplete() {
+        showScreen('finish-screen');
+        if(unlocked === 1) {
+            unlocked = 2;
+            localStorage.setItem('scix_lvl', 2);
+            document.getElementById('finishTitle').innerText = "LEVEL UP!";
+            document.getElementById('finishText').innerText = "מדהים! סיימת את השלב ופתחת את LEVEL 2!";
+        } else {
+            document.getElementById('finishTitle').innerText = "MISSION COMPLETE";
+            document.getElementById('finishText').innerText = "כל הכבוד! סיימת את כל השאלות במשימה זו.";
+        }
+        confetti({ particleCount: 150, spread: 100 });
+    }
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    // --- אנימציית חלקיקים (Particles) ---
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
-    let pts = [];
+    let points = [];
+
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.onresize = resize; resize();
-    for(let i=0; i<50; i++) pts.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, v:0.5});
-    function draw() {
+
+    for(let i=0; i<60; i++) points.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5});
+
+    function animate() {
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = "rgba(0, 245, 255, 0.1)";
-        pts.forEach(p => {
-            p.y -= p.v; if(p.y < 0) p.y = canvas.height;
-            ctx.beginPath(); ctx.arc(p.x, p.y, 1, 0, Math.PI*2); ctx.fill();
+        points.forEach((p, i) => {
+            p.x += p.vx; p.y += p.vy;
+            if(p.x<0 || p.x>canvas.width) p.vx *= -1;
+            if(p.y<0 || p.y>canvas.height) p.vy *= -1;
+
+            ctx.beginPath(); ctx.arc(p.x, p.y, 1.5, 0, Math.PI*2);
+            ctx.fillStyle = "rgba(0, 245, 255, 0.2)"; ctx.fill();
+
+            for(let j=i+1; j<points.length; j++) {
+                const p2 = points[j];
+                const dist = Math.hypot(p.x-p2.x, p.y-p2.y);
+                if(dist < 120) {
+                    ctx.beginPath(); ctx.strokeStyle = `rgba(0, 245, 255, ${0.15 * (1 - dist/120)})`;
+                    ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+                }
+            }
         });
-        requestAnimationFrame(draw);
+        requestAnimationFrame(animate);
     }
-    draw(); init();
+    animate(); init();
 </script>
 </body>
 </html>
