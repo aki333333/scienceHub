@@ -1,7 +1,17 @@
 import { supabase } from "./supabase.js";
 import { login, logout, register, getSessionUser } from "./auth.js";
-import { ensureProfile, getMyProfile, updateMyProgress, uploadAvatar, removeAvatar } from "./profile.js";
-import { fetchLeaderboard, renderLeaderboardList, renderTop3 } from "./leaderboard.js";
+import {
+  ensureProfile,
+  getMyProfile,
+  updateMyProgress,
+  uploadAvatar,
+  removeAvatar
+} from "./profile.js";
+import {
+  fetchLeaderboard,
+  renderLeaderboardList,
+  renderTop3
+} from "./leaderboard.js";
 
 const authCard = document.getElementById("authCard");
 const appCard = document.getElementById("appCard");
@@ -58,19 +68,25 @@ async function renderBoard() {
 
 async function onAuthenticated(user) {
   currentUser = user;
+
   await ensureProfile(user);
   await renderProfile(user.id);
   await renderBoard();
+
   authCard.classList.add("hidden");
   appCard.classList.add("show");
 }
 
 function onSignedOut() {
   currentUser = null;
+
   authCard.classList.remove("hidden");
   appCard.classList.remove("show");
+
   setAuthMode("login");
 }
+
+/* ---------------- AUTH UI ---------------- */
 
 showLogin.addEventListener("click", () => setAuthMode("login"));
 showRegister.addEventListener("click", () => setAuthMode("register"));
@@ -80,7 +96,9 @@ loginForm.addEventListener("submit", async (e) => {
   try {
     const email = document.getElementById("loginEmail").value.trim();
     const password = document.getElementById("loginPassword").value;
+
     await login({ email, password });
+
     setMessage(authMessage, "Logged in successfully.");
   } catch (err) {
     setMessage(authMessage, err.message, true);
@@ -93,12 +111,16 @@ registerForm.addEventListener("submit", async (e) => {
     const username = document.getElementById("registerUsername").value.trim();
     const email = document.getElementById("registerEmail").value.trim();
     const password = document.getElementById("registerPassword").value;
+
     await register({ username, email, password });
-    setMessage(authMessage, "Registered. Verify email if confirmation is enabled.");
+
+    setMessage(authMessage, "Registered. Check email to verify account.");
   } catch (err) {
     setMessage(authMessage, err.message, true);
   }
 });
+
+/* ---------------- LOGOUT ---------------- */
 
 logoutBtn.addEventListener("click", async () => {
   try {
@@ -108,14 +130,19 @@ logoutBtn.addEventListener("click", async () => {
   }
 });
 
+/* ---------------- AVATAR ---------------- */
+
 uploadAvatarBtn.addEventListener("click", async () => {
   try {
     const file = avatarFileInput.files?.[0];
-    if (!file) return setMessage(profileMessage, "Please select an image file.", true);
+    if (!file) return setMessage(profileMessage, "Select image first", true);
+
     await uploadAvatar(currentUser.id, file);
+
     await renderProfile(currentUser.id);
     await renderBoard();
-    setMessage(profileMessage, "Avatar updated.");
+
+    setMessage(profileMessage, "Avatar updated");
   } catch (err) {
     setMessage(profileMessage, err.message, true);
   }
@@ -124,27 +151,37 @@ uploadAvatarBtn.addEventListener("click", async () => {
 removeAvatarBtn.addEventListener("click", async () => {
   try {
     await removeAvatar(currentUser.id);
+
     await renderProfile(currentUser.id);
     await renderBoard();
-    setMessage(profileMessage, "Avatar removed.");
+
+    setMessage(profileMessage, "Avatar removed");
   } catch (err) {
     setMessage(profileMessage, err.message, true);
   }
 });
 
+/* ---------------- LEADERBOARD ---------------- */
+
 rangeTabs.forEach((btn) => {
   btn.addEventListener("click", async () => {
     currentRange = btn.dataset.range;
+
     rangeTabs.forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
+
     await renderBoard();
   });
 });
 
+/* ---------------- GLOBAL SYNC ---------------- */
+
 window.syncSupabaseProgress = async ({ xp, level, streak, progress }) => {
   if (!currentUser) return;
+
   try {
     await updateMyProgress(currentUser.id, { xp, level, streak, progress });
+
     await renderProfile(currentUser.id);
     await renderBoard();
   } catch (err) {
@@ -152,13 +189,31 @@ window.syncSupabaseProgress = async ({ xp, level, streak, progress }) => {
   }
 };
 
+/* ---------------- FIX: AUTH STATE ---------------- */
+
 supabase.auth.onAuthStateChange(async (_event, session) => {
-  if (session?.user) await onAuthenticated(session.user);
-  else onSignedOut();
+  if (session?.user) {
+    await onAuthenticated(session.user);
+  } else {
+    onSignedOut();
+  }
 });
 
-(async function bootstrap() {
-  const user = await getSessionUser();
-  if (user) await onAuthenticated(user);
-  else onSignedOut();
-})();
+/* ---------------- FIX: SESSION RECOVERY ---------------- */
+
+async function restoreSession() {
+  // 🔥 תופס session גם אחרי email redirect (GitHub Pages fix)
+  await supabase.auth.getSessionFromUrl?.({ storeSession: true });
+
+  const { data } = await supabase.auth.getSession();
+
+  if (data?.session?.user) {
+    await onAuthenticated(data.session.user);
+  } else {
+    onSignedOut();
+  }
+}
+
+/* ---------------- START ---------------- */
+
+restoreSession();
