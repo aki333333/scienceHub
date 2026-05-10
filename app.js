@@ -1,5 +1,5 @@
 import { supabase } from "./supabase.js";
-import { login, logout, register, getSessionUser } from "./auth.js";
+import { login, logout, register } from "./auth.js";
 import {
   ensureProfile,
   getMyProfile,
@@ -41,10 +41,12 @@ let currentUser = null;
 
 function setAuthMode(mode) {
   const isLogin = mode === "login";
+
   loginForm.classList.toggle("hidden", !isLogin);
   registerForm.classList.toggle("hidden", isLogin);
   showLogin.classList.toggle("active", isLogin);
   showRegister.classList.toggle("active", !isLogin);
+
   authMessage.textContent = "";
 }
 
@@ -55,6 +57,7 @@ function setMessage(el, msg, isError = false) {
 
 async function renderProfile(userId) {
   const profile = await getMyProfile(userId);
+
   usernameText.textContent = profile.username;
   statsText.textContent = `XP ${profile.xp} • Level ${profile.level} • 🔥 ${profile.streak}`;
   avatarImg.src = profile.avatar_url || "https://placehold.co/64x64?text=?";
@@ -62,6 +65,7 @@ async function renderProfile(userId) {
 
 async function renderBoard() {
   const users = await fetchLeaderboard(currentRange);
+
   renderTop3(top3El, users);
   renderLeaderboardList(leaderboardList, users);
 }
@@ -93,6 +97,7 @@ showRegister.addEventListener("click", () => setAuthMode("register"));
 
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   try {
     const email = document.getElementById("loginEmail").value.trim();
     const password = document.getElementById("loginPassword").value;
@@ -107,6 +112,7 @@ loginForm.addEventListener("submit", async (e) => {
 
 registerForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   try {
     const username = document.getElementById("registerUsername").value.trim();
     const email = document.getElementById("registerEmail").value.trim();
@@ -114,7 +120,8 @@ registerForm.addEventListener("submit", async (e) => {
 
     await register({ username, email, password });
 
-    setMessage(authMessage, "Registered. Check email to verify account.");
+    setMessage(authMessage, "Account created. You can log in now.");
+    setAuthMode("login");
   } catch (err) {
     setMessage(authMessage, err.message, true);
   }
@@ -135,7 +142,11 @@ logoutBtn.addEventListener("click", async () => {
 uploadAvatarBtn.addEventListener("click", async () => {
   try {
     const file = avatarFileInput.files?.[0];
-    if (!file) return setMessage(profileMessage, "Select image first", true);
+
+    if (!file) {
+      setMessage(profileMessage, "Select image first", true);
+      return;
+    }
 
     await uploadAvatar(currentUser.id, file);
 
@@ -189,7 +200,7 @@ window.syncSupabaseProgress = async ({ xp, level, streak, progress }) => {
   }
 };
 
-/* ---------------- FIX: AUTH STATE ---------------- */
+/* ---------------- AUTH STATE ---------------- */
 
 supabase.auth.onAuthStateChange(async (_event, session) => {
   if (session?.user) {
@@ -199,12 +210,9 @@ supabase.auth.onAuthStateChange(async (_event, session) => {
   }
 });
 
-/* ---------------- FIX: SESSION RECOVERY ---------------- */
+/* ---------------- SESSION RECOVERY ---------------- */
 
 async function restoreSession() {
-  // 🔥 תופס session גם אחרי email redirect (GitHub Pages fix)
-  await supabase.auth.getSessionFromUrl?.({ storeSession: true });
-
   const { data } = await supabase.auth.getSession();
 
   if (data?.session?.user) {
