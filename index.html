@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מדע בכיף – תרגול מקצועות</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./main.css">
 <style>
 :root {
   --cyan: #00f5ff;
@@ -148,9 +149,61 @@ footer{border-top:1px solid var(--border);margin-top:6rem;padding:3rem 1.5rem;te
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes scrollPulse{0%,100%{opacity:.2;transform:scaleY(.8)}50%{opacity:1;transform:scaleY(1)}}
+
+/* Supabase auth + profile + leaderboard shell */
+.shell-wrap{max-width:1000px;margin:1rem auto 0;padding:0 1.5rem}
+#authCard{background:#060f1a;border:1px solid var(--border);border-radius:18px;padding:1.25rem;margin-bottom:1rem}
+#authCard h2{font-family:'Orbitron',monospace;font-size:1rem;color:var(--cyan)}
+#authCard .muted{font-size:12px;color:var(--muted)}
+#appCard{display:none}
+#appCard.show{display:block}
+.profile-controls{margin-top:.8rem}
+.leaderboard-shell{max-width:1000px;margin:2rem auto;padding:0 1.5rem 3rem}
+.leaderboard-shell h3{font-family:'Orbitron',monospace;letter-spacing:2px;color:var(--cyan)}
 </style>
 </head>
 <body>
+<div class="shell-wrap">
+  <section id="authCard">
+    <h2>כניסה למשתמש</h2>
+    <p class="muted">התחבר/י כדי לשמור XP, רצף, רמות והתקדמות בענן</p>
+    <div class="tabs">
+      <button id="showLogin" class="tab active">Login</button>
+      <button id="showRegister" class="tab">Register</button>
+    </div>
+    <form id="loginForm" class="form">
+      <input id="loginEmail" type="email" placeholder="Email" required />
+      <input id="loginPassword" type="password" placeholder="Password" required />
+      <button type="submit" class="btn primary">Login</button>
+    </form>
+    <form id="registerForm" class="form hidden">
+      <input id="registerUsername" type="text" placeholder="Username" minlength="3" maxlength="24" required />
+      <input id="registerEmail" type="email" placeholder="Email" required />
+      <input id="registerPassword" type="password" placeholder="Password (min 8)" minlength="8" required />
+      <button type="submit" class="btn primary">Create Account</button>
+    </form>
+    <p id="authMessage" class="message"></p>
+  </section>
+
+  <section id="appCard">
+    <div class="topbar">
+      <div class="profile-mini">
+        <img id="avatarImg" class="avatar" alt="avatar" />
+        <div>
+          <h2 id="usernameText">Player</h2>
+          <p id="statsText" class="muted">XP 0 • Level 1 • 🔥 0</p>
+        </div>
+      </div>
+      <button id="logoutBtn" class="btn danger">Logout</button>
+    </div>
+    <div class="profile-controls row">
+      <input id="avatarFile" type="file" accept="image/*" />
+      <button id="uploadAvatarBtn" class="btn">Upload Avatar</button>
+      <button id="removeAvatarBtn" class="btn ghost">Remove Avatar</button>
+      <p id="profileMessage" class="message"></p>
+    </div>
+  </section>
+</div>
 
 <section id="hero">
   <canvas id="particles-canvas"></canvas>
@@ -225,6 +278,18 @@ footer{border-top:1px solid var(--border);margin-top:6rem;padding:3rem 1.5rem;te
     </div>
     <div class="progress" id="prog"></div>
   </div>
+</section>
+
+<section class="leaderboard-shell">
+  <div class="board-header">
+    <h3>Leaderboard</h3>
+    <div class="row">
+      <button class="tab active" data-range="all_time">All-time</button>
+      <button class="tab" data-range="weekly">Weekly</button>
+    </div>
+  </div>
+  <div id="top3" class="top3"></div>
+  <ul id="leaderboardList" class="leaderboard-list"></ul>
 </section>
 
 <!-- MEDICAL WARNING MODAL -->
@@ -564,6 +629,8 @@ let state={
   medicalConfirmed:false
 };
 
+window.quizProgressState = state;
+
 // Build subject selector
 function buildSubjects(){
   const grid=document.getElementById('subjectsGrid');
@@ -672,6 +739,12 @@ function answer(i){
   localStorage.setItem('userXP',state.xp);
   localStorage.setItem('userCorrect',state.correct);
   localStorage.setItem('userWrong',state.wrong);
+  window.syncSupabaseProgress?.({
+    xp: state.xp,
+    level: state.lvl,
+    streak: state.streak,
+    progress: state.correct + state.wrong
+  });
   updateStats();
   document.getElementById("nextBtn").disabled=false;
 }
@@ -731,6 +804,12 @@ async function initApp() {
   try {
     await loadQuestions();
     buildSubjects();
+    window.syncSupabaseProgress?.({
+      xp: state.xp,
+      level: state.lvl,
+      streak: state.streak,
+      progress: state.correct + state.wrong
+    });
   } catch (err) {
     console.error(err);
     document.getElementById('subject-section').innerHTML = `
@@ -745,5 +824,6 @@ async function initApp() {
 
 initApp();
 </script>
+<script type="module" src="./app.js"></script>
 </body>
 </html>
